@@ -1,5 +1,6 @@
 using FiniteStateAutomata.Automata.FiniteState;
 using FiniteStateAutomata.Automata.Alphabet;
+using FiniteStateAutomata.Automata;
 
 namespace FiniteStateAutomata.Console
 {
@@ -7,7 +8,7 @@ namespace FiniteStateAutomata.Console
     {
         public static void Main(string[] args)
         {
-            /*var factory = new AutomataFactory();
+            var factory = new AutomataFactory();
             var dautomata = factory.CreateDeterministic("ba!")
                                 .Set('!').Values('!', 'h')
                                 .Set('a').Values('a', 'e')
@@ -19,10 +20,11 @@ namespace FiniteStateAutomata.Console
                                 .When('!').MoveToNext()
                              .OnNext().Accept();
                              
-            bool match = dautomata.IsMatch();
-            System.Console.WriteLine($"{name}");*/
+            bool m1 = dautomata.IsMatch("baaaah");
+            bool m2 = dautomata.IsMatch("beeeaa!");
+            System.Console.WriteLine($"{m1} - {m2}");
             
-            var s1 = new AutomataAlphabetSymbolBase<char, char>[] 
+            /*var s1 = new AutomataAlphabetSymbolBase<char, char>[] 
                         { 
                             new AutomataAlphabetSymbol<char>('b'),
                             new AutomataAlphabetSymbol<char>('a'),
@@ -67,6 +69,30 @@ namespace FiniteStateAutomata.Console
             
             System.Console.WriteLine($"{m1} - {m2} - {m3} - {m4}");
             
+            var n1 = new NonDeterministicAutomata<char, char>(a1);
+            var n2 = new NonDeterministicAutomata<char, char>(a2);
+            
+            n1.AddTransition(0, 0, 1)
+                .AddState()
+                .AddTransition(1, 1, 1)
+                .AddTransition(1, 1, 2)
+                .AddState()
+                .AcceptState(2);
+                
+            n2.AddTransition(0, 0, 1)
+                .AddState()
+                .AddTransition(1, 1, 1)
+                .AddTransition(1, 1, 2)
+                .AddState()
+                .AcceptState(2);
+            
+            bool m5 = n1.IsMatch('b', 'a', '!');
+            bool m6 = n2.IsMatch('b', 'e', 'e', 'h');
+            bool m7 = n1.IsMatch('b', 'e', '!');
+            bool m8 = n2.IsMatch('b', 'e', '!', 'h');
+            
+            System.Console.WriteLine($"{m5} - {m6} - {m7} - {m8}");
+            */
             System.Console.WriteLine("Hello World");
             System.Console.Read();
         }

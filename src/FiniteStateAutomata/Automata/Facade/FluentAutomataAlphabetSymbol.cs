@@ -4,7 +4,7 @@ namespace FiniteStateAutomata.Automata.Facade
 {
     public class FluentAutomataAlphabetSymbol<T>
     {
-        /*private FluentAutomataAlphabetBuilder<T> _alphabetBuilder;
+        private FluentAutomataAlphabetBuilder<T> _alphabetBuilder;
         private T[] _values;
         
         public T Key { get; private set; }
@@ -21,9 +21,9 @@ namespace FiniteStateAutomata.Automata.Facade
             return _alphabetBuilder;
         }
         
-        internal AutomataAlphabetSymbol<T> GetSymbol()
+        internal AutomataAlphabetSymbolBase<T, T> GetSymbol()
         {
-            return new AutomataAlphabetSymbol<T>(Key, _values);
-        }*/
+            return new KeyValuesAutomataAlphabetSymbol<T>(Key, _values);
+        }
     }
 }

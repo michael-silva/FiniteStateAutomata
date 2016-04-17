@@ -17,6 +17,7 @@ namespace FiniteStateAutomata.Automata.Alphabet
         {
             for(int i = 0; i < Length; i++)
                 if(_symbols[i].HasValue(value)) return i;
+            
             return -1;
         }
     }    

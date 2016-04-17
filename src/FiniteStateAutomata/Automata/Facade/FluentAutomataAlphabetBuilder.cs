@@ -1,14 +1,18 @@
+using System;
 using System.Collections.Generic;
+using FiniteStateAutomata.Automata.Interfaces;
 using FiniteStateAutomata.Automata.Alphabet;
 
 namespace FiniteStateAutomata.Automata.Facade
 {
     public class FluentAutomataAlphabetBuilder<T>
     {
-        /*private List<FluentAutomataAlphabetSymbol<T>> _alphabet;
+        protected List<FluentAutomataAlphabetSymbol<T>> _alphabet;
+        protected Func<AutomataAlphabet<T, T>, IAutomata<T, T>> _instantiate;
         
-        public FluentAutomataAlphabetBuilder(params T[] symbols)
+        public FluentAutomataAlphabetBuilder(T[] symbols, Func<AutomataAlphabet<T, T>, IAutomata<T, T>> func)
         {
+            _instantiate = func;
             _alphabet = new List<FluentAutomataAlphabetSymbol<T>>();
             for(int i = 0; i < symbols.Length; i++) 
                 _alphabet.Add(new FluentAutomataAlphabetSymbol<T>(symbols[i], this));
@@ -33,18 +37,19 @@ namespace FiniteStateAutomata.Automata.Facade
             return symbol;
         }
         
-        public FluentAutomataBase<T> OnFirstState()
+        public FluentAutomata<T> OnFirstState()
         {
             var alphabet = MakeAlphabet();
-            return new FluentAutomataBase<T>(alphabet);
+            var automata = _instantiate(alphabet);
+            return new FluentAutomata<T>(automata);
         }
         
-        private AutomataAlphabet<T> MakeAlphabet()
+        protected AutomataAlphabet<T, T> MakeAlphabet()
         {
-            var symbols = new AutomataAlphabetSymbol<T>[_alphabet.Count];
+            AutomataAlphabetSymbolBase<T, T>[] symbols = new KeyValuesAutomataAlphabetSymbol<T>[_alphabet.Count];
             int i = 0;
             foreach(var s in _alphabet) symbols[i++] = s.GetSymbol();
-            return new AutomataAlphabet<T>(symbols);
-        }*/
+            return new AutomataAlphabet<T, T>(symbols);
+        }
     }
 }

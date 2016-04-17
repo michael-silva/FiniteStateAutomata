@@ -37,6 +37,29 @@ namespace FiniteStateAutomata.Automata.FiniteState
             return this;
         }
         
+        public int IndexOf(TValue value)
+        {
+            return _alphabet.IndexByValue(value);
+        }
+        
+        public bool IsMatchExact(params TValue[] values)
+        {
+            var matches = Matches(values);
+            return matches.Count > 0 && matches.ContainsKey(0) && matches[matches.Keys.Max()] == values.Length - 1;
+        }
+        
+        public bool IsMatchExactEnd(params TValue[] values)
+        {
+            var matches = Matches(values);
+            return matches.Count > 0 && matches[matches.Keys.Max()] == values.Length - 1;
+        }
+        
+        public bool IsMatchExactStart(params TValue[] values)
+        {
+            var matches = Matches(values);
+            return matches.Count > 0 && matches.ContainsKey(0);
+        }
+        
         public bool IsMatch(params TValue[] values)
         {
             return Matches(values).Count > 0;
@@ -49,11 +72,9 @@ namespace FiniteStateAutomata.Automata.FiniteState
             for(int i = 0; i < values.Length; i++)
             {
                 int find = _alphabet.IndexByValue(values[i]);
-                Console.WriteLine($"find {find}={values[i]}");
                 if(find >= 0)
                 {
                     int temp = _transitions[curr][find];
-                    Console.WriteLine($"find {curr},{find}={temp}");
                     if(temp >= 0)
                     {
                         if(start < 0)
@@ -66,7 +87,6 @@ namespace FiniteStateAutomata.Automata.FiniteState
                 }
                 if(find == -1)
                 {
-                    Console.WriteLine($"dont find {curr}-{accept}");
                     if(accept >= 0) matches.Add(start, accept);
                     start = accept = -1;
                     curr = 0;
@@ -74,7 +94,6 @@ namespace FiniteStateAutomata.Automata.FiniteState
                 
             }
             
-                    Console.WriteLine($"exited {accept}");
             if(accept >= 0) matches.Add(start, accept);
             return matches;
         }

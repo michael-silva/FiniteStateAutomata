@@ -10,7 +10,15 @@ namespace FiniteStateAutomata.Automata.Interfaces
         
         IAutomata<TKey, TValue> AcceptState(int index);
         
+        int IndexOf(TValue value);
+        
         bool IsMatch(params TValue[] values);
+        
+        bool IsMatchExact(params TValue[] values);
+        
+        bool IsMatchExactEnd(params TValue[] values);
+        
+        bool IsMatchExactStart(params TValue[] values);
         
         Dictionary<int, int> Matches(params TValue[] values);
     }
