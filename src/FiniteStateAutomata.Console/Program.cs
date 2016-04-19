@@ -8,10 +8,12 @@ namespace FiniteStateAutomata.Console
     {
         public static void Main(string[] args)
         {
-            var factory = new AutomataFactory();
-            var dautomata = factory.CreateDeterministic("ba!")
-                                .Set('!').Values('!', 'h')
-                                .Set('a').Values('a', 'e')
+            var alphabet = new AutomataAlphabet()
+                                .Add('b');
+                                //.AddGroup('!', 'h')
+                                //.AddGroup('a', 'e');
+                                
+            /*var dautomata = new DAutomata(alphabet)
                              .OnFirstState()
                                 .When('b').MoveToNext()
                              .OnNext()
@@ -22,7 +24,7 @@ namespace FiniteStateAutomata.Console
                              
             bool m1 = dautomata.IsMatch("baaaah");
             bool m2 = dautomata.IsMatch("beeeaa!");
-            System.Console.WriteLine($"{m1} - {m2}");
+            System.Console.WriteLine($"{m1} - {m2}");*/
             
             /*var s1 = new AutomataAlphabetSymbolBase<char, char>[] 
                         { 

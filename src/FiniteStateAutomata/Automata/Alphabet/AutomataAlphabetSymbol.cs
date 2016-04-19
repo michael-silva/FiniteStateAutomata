@@ -1,14 +1,18 @@
 using System.Collections.Generic;
+using FiniteStateAutomata.Automata.Interfaces;
 
 namespace FiniteStateAutomata.Automata.Alphabet
 {
-    public class AutomataAlphabetSymbol<T> : AutomataAlphabetSymbolBase<T, T>
+    public class AutomataAlphabetSymbol<T> : IAutomataAlphabetSymbol<T>
     {   
-        public AutomataAlphabetSymbol(T key)
-            : base(key)
-        { }
+        public T Key { get; private set; }
         
-        public override bool HasValue(T value)
+        public AutomataAlphabetSymbol(T key)
+        { 
+            Key = key;
+        }
+        
+        public bool HasValue(T value)
         {
             return Key.Equals(value);
         }

@@ -1,14 +1,17 @@
 using System.Collections.Generic;
+using FiniteStateAutomata.Automata.Interfaces;
 
 namespace FiniteStateAutomata.Automata.Alphabet
 {
-    public class KeyValuesAutomataAlphabetSymbol<TKey, TValue> : AutomataAlphabetSymbolBase<TKey, TValue> 
+    public class KeyValuesAutomataAlphabetSymbol<TKey, TValue> : IAutomataAlphabetSymbol<TValue> 
     {
-        protected List<TValue> _values;
+        private List<TValue> _values;
+        
+        public TKey Key { get; private set; }
         
         public KeyValuesAutomataAlphabetSymbol(TKey key, params TValue[] values)
-            : base(key)
         {
+            Key = key;
             _values = new List<TValue>();
             
             if(values != null)
@@ -18,25 +21,11 @@ namespace FiniteStateAutomata.Automata.Alphabet
             }
         }
         
-        public override bool HasValue(TValue value)
+        public bool HasValue(TValue value)
         {
             for(int i = 0; i < _values.Count; i++)
                 if(_values[i].Equals(value)) return true;
             return false;
         }
     }
-    
-    public class KeyValuesAutomataAlphabetSymbol<T> : KeyValuesAutomataAlphabetSymbol<T, T>
-    {   
-        public KeyValuesAutomataAlphabetSymbol(T key, params T[] values)
-            : base(key, values)
-        { 
-            _values.Add(key);
-        }
-        
-        public KeyValuesAutomataAlphabetSymbol(T key)
-            : base(key, key)
-        { }
-    }
-       
 }

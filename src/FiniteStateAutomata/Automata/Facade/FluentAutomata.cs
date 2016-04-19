@@ -8,7 +8,7 @@ namespace FiniteStateAutomata.Automata.Facade
 {
     public class FluentAutomata<T>
     {
-        private IAutomata<T, T> _automata;
+        /*private IAutomata<T, T> _automata;
         private int _currState, _currSymbol;
         
         public FluentAutomata(IAutomata<T, T> automata)
@@ -33,8 +33,8 @@ namespace FiniteStateAutomata.Automata.Facade
             return this;
         }
         
-        public FluentAutomata<T> OnNext()
         {
+        public FluentAutomata<T> OnNext()
             _automata.AddState();
             return this;
         }
@@ -59,6 +59,6 @@ namespace FiniteStateAutomata.Automata.Facade
         public Dictionary<int, int> Matches(params T[] values)
         {
             return _automata.Matches(values);
-        }
+        }*/
     }   
 }

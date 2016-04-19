@@ -15,13 +15,13 @@ namespace FiniteStateAutomata.Automata.FiniteState
         public NonDeterministicAutomata(AutomataAlphabet<TKey, TValue> alphabet)
         {
             _alphabet = alphabet;
-            _transitions = new List<List<int>[]>() { new List<int>[_alphabet.Length] };
+            _transitions = new List<List<int>[]>() { new List<int>[_alphabet.Count] };
             _accepts = new List<int>();
         }
         
         public IAutomata<TKey, TValue> AddState()
         {
-            _transitions.Add(new List<int>[_alphabet.Length]);   
+            _transitions.Add(new List<int>[_alphabet.Count]);   
             return this;
         }
         
