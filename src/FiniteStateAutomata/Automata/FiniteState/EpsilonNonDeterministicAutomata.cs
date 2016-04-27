@@ -6,14 +6,14 @@ using FiniteStateAutomata.Automata.Alphabet;
 
 namespace FiniteStateAutomata.Automata.FiniteState
 {
-    public class NonDeterministicAutomata<T> : IAutomata<T>
+    public class EpsilonNonDeterministicAutomata<T> : IAutomata<T>
     {
         private const int ACCEPT = 1;
         
         private IAutomataAlphabet<T> _alphabet;
         private List<List<int>[]> _transitions;
         
-        public NonDeterministicAutomata(IAutomataAlphabet<T> alphabet)
+        public EpsilonNonDeterministicAutomata(IAutomataAlphabet<T> alphabet)
         {
             _alphabet = alphabet;
             _transitions = new List<List<int>[]>();
@@ -59,13 +59,13 @@ namespace FiniteStateAutomata.Automata.FiniteState
         public bool IsMatch(params T[] values)
         {
             var matches = Matches(values);
-            return matches.Count > 0 && matches.ContainsKey(0) && matches[0] == values.Length - 1;
+            return matches.Count > 0 && matches.ContainsKey(0) && matches[0] == _transitions.Count - 1;
         }
         
         public bool EndMatch(params T[] values)
         {
             var matches = Matches(values);
-            return matches.Count > 0 && matches[matches.Keys.Max()] == values.Length - 1;
+            return matches.Count > 0 && matches[matches.Keys.Max()] == _transitions.Count - 1;
         }
         
         public bool BeginMatch(params T[] values)
@@ -99,9 +99,9 @@ namespace FiniteStateAutomata.Automata.FiniteState
                             if(temp[j] >= 0)
                             {
                                 if(start < 0)
-                                    start = i;
-                                if(_transitions[temp[j]][col] != null && _transitions[temp[j]][col][0] == ACCEPT)
-                                    accept = i;
+                                    start = curr;
+                                else if(_transitions[temp[j]][col] != null && _transitions[temp[j]][col][0] == ACCEPT)
+                                    accept = temp[j];
                                 backup.Enqueue(curr);
                                 curr = temp[j];
                             }

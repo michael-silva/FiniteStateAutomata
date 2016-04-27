@@ -12,13 +12,7 @@ namespace FiniteStateAutomata.Automata.Alphabet
         public KeyValuesAutomataAlphabetSymbol(TKey key, params TValue[] values)
         {
             Key = key;
-            _values = new List<TValue>();
-            
-            if(values != null)
-            {
-                for(int i = 0; i < values.Length; i++)
-                    _values.Add(values[i]);
-            }
+            _values = new List<TValue>(values);
         }
         
         public bool HasValue(TValue value)

@@ -6,95 +6,111 @@ using FiniteStateAutomata.Automata.Alphabet;
 
 namespace FiniteStateAutomata.Automata.FiniteState
 {
-    public class DeterministicAutomata<TKey, TValue> : IAutomata<TKey, TValue>
+    public class DeterministicAutomata<T> : IAutomata<T>
     {
-        private AutomataAlphabet<TKey, TValue> _alphabet;
-        private List<int[]> _transitions;
-        private List<int> _accepts;
+        private const int ACCEPT = 1;
         
-        public DeterministicAutomata(AutomataAlphabet<TKey, TValue> alphabet)
+        private IAutomataAlphabet<T> _alphabet;
+        private List<int?[]> _transitions;
+        
+        public DeterministicAutomata(IAutomataAlphabet<T> alphabet)
         {
             _alphabet = alphabet;
-            _transitions = new List<int[]>() { new int[_alphabet.Count] };
-            _accepts = new List<int>();
+            _transitions = new List<int?[]>();
         }
         
-        public IAutomata<TKey, TValue> AddState()
+        public IAutomata<T> AddState()
         {
-            _transitions.Add(new int[_alphabet.Count]);   
+            _transitions.Add(new int?[_alphabet.Count + 1]);   
             return this;
         }
         
-        public IAutomata<TKey, TValue> AddTransition(int fromState, int symbol, int toState)
+        public IAutomata<T> AddTransition(T symbol, int fromState, int toState)
         {
-            _transitions[fromState][symbol] = toState;
+            int index = _alphabet.IndexByValue(symbol);
+            _transitions[fromState][index] = toState;
             return this;
         }
         
-        public IAutomata<TKey, TValue> AcceptState(int index)
+        public IAutomata<T> AcceptState(int index)
         {
-            _accepts.Add(index);
+            int col = _transitions[index].Length - 1;
+            _transitions[index][col] = ACCEPT;
             return this;
         }
         
-        public int IndexOf(TValue value)
+        public IAutomata<T> Concat(IAutomata<T> automata)
         {
-            return _alphabet.IndexByValue(value);
+            return this;
         }
         
-        public bool IsMatchExact(params TValue[] values)
+        public IAutomata<T> Union(IAutomata<T> automata)
+        {
+            return this;
+        }
+        
+        public IAutomata<T> Closure()
+        {
+            return this;
+        }
+        
+        public bool IsMatch(params T[] values)
         {
             var matches = Matches(values);
-            return matches.Count > 0 && matches.ContainsKey(0) && matches[matches.Keys.Max()] == values.Length - 1;
+            /*foreach(var m in matches)
+                System.Console.WriteLine($"{m.Key} - {m.Value}");*/
+            return matches.Count > 0 && matches.ContainsKey(0) && matches[0] == values.Length - 1;
         }
         
-        public bool IsMatchExactEnd(params TValue[] values)
+        public bool EndMatch(params T[] values)
         {
             var matches = Matches(values);
             return matches.Count > 0 && matches[matches.Keys.Max()] == values.Length - 1;
         }
         
-        public bool IsMatchExactStart(params TValue[] values)
+        public bool BeginMatch(params T[] values)
         {
             var matches = Matches(values);
             return matches.Count > 0 && matches.ContainsKey(0);
         }
         
-        public bool IsMatch(params TValue[] values)
+        public bool AnyMatch(params T[] values)
         {
-            return Matches(values).Count > 0;
+            var matches = Matches(values);
+            return matches.Count > 0;
         }
         
-        public Dictionary<int, int> Matches(params TValue[] values)
+        public Dictionary<int, int> Matches(params T[] values)
         {
             var matches = new Dictionary<int, int>();
-            int start = -1, accept = -1, curr = 0;
+            int col = _transitions[0].Length - 1;
+            int start = -1, accept = -1, curr = 0, find = 0;
+            int? temp = null;
             for(int i = 0; i < values.Length; i++)
             {
-                int find = _alphabet.IndexByValue(values[i]);
+                find = _alphabet.IndexByValue(values[i]);
                 if(find >= 0)
                 {
-                    int temp = _transitions[curr][find];
-                    if(temp >= 0)
+                    temp = _transitions[curr][find];
+                    if(temp.HasValue)
                     {
                         if(start < 0)
-                            start = temp;
-                        else if(_accepts.Any(x => x == temp))
-                            accept = temp;
-                        curr = temp;
+                            start = i;
+                        if(_transitions[temp.Value][col].HasValue && _transitions[temp.Value][col].Value == ACCEPT)
+                            accept = i;
+                        
+                        curr = temp.Value;
                     }
-                    else find = -1;
                 }
-                if(find == -1)
+                
+                if(i == values.Length - 1 || !temp.HasValue || find == -1)
                 {
                     if(accept >= 0) matches.Add(start, accept);
                     start = accept = -1;
                     curr = 0;
                 }
-                
             }
             
-            if(accept >= 0) matches.Add(start, accept);
             return matches;
         }
     }

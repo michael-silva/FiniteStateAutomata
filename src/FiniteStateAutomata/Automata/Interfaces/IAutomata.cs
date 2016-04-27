@@ -2,24 +2,30 @@ using System.Collections.Generic;
 
 namespace FiniteStateAutomata.Automata.Interfaces
 {
-    public interface IAutomata<TKey, TValue>
-    {
-        IAutomata<TKey, TValue> AddState();
+    public interface IAutomata<T>
+    {   
+        IAutomata<T> AddState();
         
-        IAutomata<TKey, TValue> AddTransition(int fromState, int symbol, int toState);
+        IAutomata<T> AddTransition(T symbol, int fromState, int toState);
         
-        IAutomata<TKey, TValue> AcceptState(int index);
+        IAutomata<T> AcceptState(int index);
         
-        int IndexOf(TValue value);
+        IAutomata<T> Concat(IAutomata<T> automata);
         
-        bool IsMatch(params TValue[] values);
+        IAutomata<T> Union(IAutomata<T> automata);
         
-        bool IsMatchExact(params TValue[] values);
+        IAutomata<T> Closure();
         
-        bool IsMatchExactEnd(params TValue[] values);
+        bool IsMatch(params T[] values);
         
-        bool IsMatchExactStart(params TValue[] values);
+        bool AnyMatch(params T[] values);
         
-        Dictionary<int, int> Matches(params TValue[] values);
+        bool EndMatch(params T[] values);
+        
+        bool BeginMatch(params T[] values);
+        
+        Dictionary<int, int> Matches(params T[] values);
+        
+        
     }
 }

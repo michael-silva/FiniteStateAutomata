@@ -6,38 +6,36 @@ using FiniteStateAutomata.Automata.Alphabet;
 
 namespace FiniteStateAutomata.Automata.FiniteState
 {
-    public class NonDeterministicAutomata<T> : IAutomata<T>
+    public class RegularExpressionAutomata<T> : IAutomata<T>
     {
         private const int ACCEPT = 1;
         
         private IAutomataAlphabet<T> _alphabet;
-        private List<List<int>[]> _transitions;
+        private List<int?[]> _transitions;
         
-        public NonDeterministicAutomata(IAutomataAlphabet<T> alphabet)
+        public RegularExpressionAutomata(IAutomataAlphabet<T> alphabet)
         {
             _alphabet = alphabet;
-            _transitions = new List<List<int>[]>();
+            _transitions = new List<int?[]>();
         }
         
         public IAutomata<T> AddState()
         {
-            _transitions.Add(new List<int>[_alphabet.Count + 1]);
+            _transitions.Add(new int?[_alphabet.Count + 1]);   
             return this;
         }
         
         public IAutomata<T> AddTransition(T symbol, int fromState, int toState)
         {
             int index = _alphabet.IndexByValue(symbol);
-            if(_transitions[fromState][index] == null)
-                _transitions[fromState][index] = new List<int>();
-            _transitions[fromState][index].Add(toState);
+            _transitions[fromState][index] = toState;
             return this;
         }
         
         public IAutomata<T> AcceptState(int index)
         {
-            int col = _transitions[index].Length - 1; 
-            _transitions[index][col] = new List<int>() { ACCEPT };
+            int col = _transitions[index].Length - 1;
+            _transitions[index][col] = ACCEPT;
             return this;
         }
         
@@ -59,13 +57,13 @@ namespace FiniteStateAutomata.Automata.FiniteState
         public bool IsMatch(params T[] values)
         {
             var matches = Matches(values);
-            return matches.Count > 0 && matches.ContainsKey(0) && matches[0] == values.Length - 1;
+            return matches.Count > 0 && matches.ContainsKey(0) && matches[0] == _transitions.Count - 1;
         }
         
         public bool EndMatch(params T[] values)
         {
             var matches = Matches(values);
-            return matches.Count > 0 && matches[matches.Keys.Max()] == values.Length - 1;
+            return matches.Count > 0 && matches[matches.Keys.Max()] == _transitions.Count - 1;
         }
         
         public bool BeginMatch(params T[] values)
@@ -76,46 +74,39 @@ namespace FiniteStateAutomata.Automata.FiniteState
         
         public bool AnyMatch(params T[] values)
         {
-            return Matches(values).Count > 0;
+            var matches = Matches(values);
+            return matches.Count > 0;
         }
         
         public Dictionary<int, int> Matches(params T[] values)
         {
             var matches = new Dictionary<int, int>();
             int col = _transitions[0].Length - 1;
-            int start = -1, accept = -1, curr = 0;
-            var backup = new Queue<int>();
+            int start = -1, accept = -1, curr = 0, find = 0;
+            int? temp = null;
             for(int i = 0; i < values.Length; i++)
             {
-                int find = _alphabet.IndexByValue(values[i]);
+                find = _alphabet.IndexByValue(values[i]);
                 if(find >= 0)
                 {
-                    var temp = _transitions[curr][find];
-                    if(temp == null || !temp.Any()) find = -1;
-                    else 
+                    temp = _transitions[curr][find];
+                    if(temp.HasValue)
                     {
-                        for(int j = 0; j < temp.Count; j++)
-                        {
-                            if(temp[j] >= 0)
-                            {
-                                if(start < 0)
-                                    start = i;
-                                if(_transitions[temp[j]][col] != null && _transitions[temp[j]][col][0] == ACCEPT)
-                                    accept = i;
-                                backup.Enqueue(curr);
-                                curr = temp[j];
-                            }
-                        }
+                        if(start < 0)
+                            start = curr;
+                        else if(_transitions[temp.Value][col].HasValue && _transitions[temp.Value][col].Value == ACCEPT)
+                            accept = temp.Value;
+                        
+                        curr = temp.Value;
                     }
                 }
                 
-                if(i == values.Length -1 || find == -1)
+                if(i == values.Length - 1 || !temp.HasValue || find == -1)
                 {
                     if(accept >= 0) matches.Add(start, accept);
                     start = accept = -1;
-                    curr = backup.Count > 0 ? backup.Dequeue() : 0;
+                    curr = 0;
                 }
-                
             }
             
             return matches;
