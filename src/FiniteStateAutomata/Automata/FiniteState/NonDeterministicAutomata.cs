@@ -9,19 +9,27 @@ namespace FiniteStateAutomata.Automata.FiniteState
     public class NonDeterministicAutomata<T> : IAutomata<T>
     {
         private const int ACCEPT = 1;
+        private readonly int ACCEPTCOL;
+        private readonly int EPSILONCOL;
         
         private IAutomataAlphabet<T> _alphabet;
         private List<List<int>[]> _transitions;
         
-        public NonDeterministicAutomata(IAutomataAlphabet<T> alphabet)
+        private NonDeterministicAutomata(IAutomataAlphabet<T> alphabet, List<List<int>[]> transitions)
         {
+            EPSILONCOL = alphabet.Length;
+            ACCEPTCOL = alphabet.Length + 1;
             _alphabet = alphabet;
-            _transitions = new List<List<int>[]>();
+            _transitions = transitions;
         }
+        
+        public NonDeterministicAutomata(IAutomataAlphabet<T> alphabet)
+            : this(alphabet, new List<List<int>[]>())
+        { }
         
         public IAutomata<T> AddState()
         {
-            _transitions.Add(new List<int>[_alphabet.Count + 1]);
+            _transitions.Add(new List<int>[_alphabet.Count + 2]);
             return this;
         }
         
@@ -36,24 +44,78 @@ namespace FiniteStateAutomata.Automata.FiniteState
         
         public IAutomata<T> AcceptState(int index)
         {
-            int col = _transitions[index].Length - 1; 
-            _transitions[index][col] = new List<int>() { ACCEPT };
+            _transitions[index][ACCEPTCOL] = new List<int>() { ACCEPT };
             return this;
         }
         
         public IAutomata<T> Concat(IAutomata<T> automata)
         {
-            return this;
+            int length = _alphabet.Count + 2;
+            var ttable = new List<List<int>[]>();
+            
+            ttable.Add(new List<int>[length]);
+            for(int i = 0; i < _transitions.Count; i++)
+            {
+                ttable.Add(new List<int>[length]);
+                ttable.Add(_transitions[i]);
+                if(ttable[i][ACCEPTCOL] != null && ttable[i][ACCEPTCOL].Count > 0)
+                {
+                    ttable[i][ACCEPTCOL] = null;
+                    ttable[i][EPSILONCOL] = new List<int>() { _transitions.Count };
+                }
+            }
+            
+            for(int i = 0; i < automata._transitions.Count; i++)
+            {
+                ttable.Add(new List<int>[length]);
+                ttable.Add(automata._transitions[i]);
+            }
+            
+            return new NonDeterministicAutomata(_alphabet, ttable);
         }
         
         public IAutomata<T> Union(IAutomata<T> automata)
         {
-            return this;
+            int length = _alphabet.Count + 2;
+            var ttable = new List<List<int>[]>();
+            
+            ttable.Add(new List<int>[length]);
+            ttable[0][EPSILONCOL].Add(1);
+            ttable[0][EPSILONCOL].Add(_transitions.Count + 1);
+            
+            for(int i = 0; i < _transitions.Count; i++)
+            {
+                ttable.Add(new List<int>[length]);
+                ttable.Add(_transitions[i]);
+            }
+            
+            for(int i = 0; i < automata._transitions.Count; i++)
+            {
+                ttable.Add(new List<int>[length]);
+                ttable.Add(automata._transitions[i]);
+            }
+            
+            return new NonDeterministicAutomata(_alphabet, ttable);
         }
         
         public IAutomata<T> Closure()
         {
-            return this;
+            int length = _alphabet.Count + 2;
+            var ttable = new List<List<int>[]>();
+            
+            ttable.Add(new List<int>[length]);
+            ttable[0][EPSILONCOL].Add(1);
+            
+            for(int i = 0; i < _transitions.Count; i++)
+            {
+                ttable.Add(new List<int>[length]);
+                ttable.Add(_transitions[i]);
+            }
+               
+            ttable.Add(new List<int>[length]);
+            ttable[ttable.Count - 1][EPSILONCOL].Add(0);
+            
+            return new NonDeterministicAutomata(_alphabet, ttable);
         }
         
         public bool IsMatch(params T[] values)
