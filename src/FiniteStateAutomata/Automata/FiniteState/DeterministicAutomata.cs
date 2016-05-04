@@ -10,20 +10,31 @@ namespace FiniteStateAutomata.Automata.FiniteState
     {
         private const int ACCEPT = 1;
         private readonly int ACCEPTCOL;
+        private readonly int LENGTH;
         
+        private int _acceptCount = 0; 
         private IAutomataAlphabet<T> _alphabet;
         private List<int?[]> _transitions;
         
-        public DeterministicAutomata(IAutomataAlphabet<T> alphabet)
+        public bool Acceptance { get { return _acceptCount > 0; } }
+        public bool Empty { get { return _alphabet.Count > 0; } }
+        public bool Totality { get { return _acceptCount == _transitions.Length; } }
+        
+        private DeterministicAutomata(IAutomataAlphabet<T> alphabet, List<int?[]> transitions)
         {
             ACCEPTCOL = alphabet.Length;
+            LENGTH = alphabet.Count + 1;
             _alphabet = alphabet;
-            _transitions = new List<int?[]>();
+            _transitions = transitions;
         }
+        
+        public DeterministicAutomata(IAutomataAlphabet<T> alphabet)
+            : this(alphabet, new List<int?[]>())
+        { }
         
         public IAutomata<T> AddState()
         {
-            _transitions.Add(new int?[_alphabet.Count + 1]);   
+            _transitions.Add(new int?[LENGTH]);   
             return this;
         }
         
@@ -36,14 +47,47 @@ namespace FiniteStateAutomata.Automata.FiniteState
         
         public IAutomata<T> AcceptState(int index)
         {
-            int col = _transitions[index].Length - 1;
-            _transitions[index][col] = ACCEPT;
+            _transitions[index][ACCEPTCOL] = ACCEPT;
+            _acceptCount++;
             return this;
+        }
+        
+        public IAutomata<T> Intersection(IAutomata<T> automata)
+        {
+            if(Empty || automata.Empty) 
+                return this;
+                
+            return this;
+        }
+        
+        public bool SubsetOf(IAutomata<T> automata)
+        {
+            return !Intersection(automata).Empty;
+        }
+        
+        public bool Equals(IAutomata<T> automata)
+        {
+            return SubsetOf(automata) && automata.SubsetOf(this);
         }
         
         public IAutomata<T> Concat(IAutomata<T> automata)
         {
-            return this;
+            var ttable = new List<int?[]>();
+            for(int i = 0; i < _transitions.Count; i++)
+            {
+                if(_transitions[i][ACCEPTCOL] == ACCEPT)
+                {
+                    ttable.Add(new int?[LENGTH]);
+                    for(int j = 0; j < ACCEPTCOL; j++) 
+                        if(ttable[i][j] == null) ttable[i][j] = automata._transitions[0][j]
+                }
+                else ttable.Add(_transitions[i]);
+            }
+            
+            for(int i = 0; i < automata._transitions.Count; i++)
+                ttable.Add(automata._transitions[i]);
+            
+            return new DeterministicAutomata(_alphabet, ttable);
         }
         
         public IAutomata<T> Union(IAutomata<T> automata)
@@ -67,7 +111,19 @@ namespace FiniteStateAutomata.Automata.FiniteState
         
         public IAutomata<T> Closure()
         {
-            return this;
+            var ttable = new List<int?[]>();
+            for(int i = 0; i < _transitions.Count; i++)
+            {
+                if(_transitions[i][ACCEPTCOL] == ACCEPT)
+                {
+                    ttable.Add(new int?[LENGTH]);
+                    for(int j = 0; j < ACCEPTCOL; j++) 
+                        if(ttable[i][j] == null) ttable[i][j] = _transitions[0][j]
+                }
+                else ttable.Add(_transitions[i]);
+            }
+            
+            return new DeterministicAutomata(_alphabet, ttable);
         }
         
         public bool AnyMatch(params T[] values)

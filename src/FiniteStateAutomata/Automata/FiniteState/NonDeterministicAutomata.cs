@@ -11,6 +11,7 @@ namespace FiniteStateAutomata.Automata.FiniteState
         private const int ACCEPT = 1;
         private readonly int ACCEPTCOL;
         private readonly int EPSILONCOL;
+        private readonly int LENGTH;
         
         private IAutomataAlphabet<T> _alphabet;
         private List<List<int>[]> _transitions;
@@ -19,6 +20,7 @@ namespace FiniteStateAutomata.Automata.FiniteState
         {
             EPSILONCOL = alphabet.Length;
             ACCEPTCOL = alphabet.Length + 1;
+            LENGTH = alphabet.Length + 2;
             _alphabet = alphabet;
             _transitions = transitions;
         }
@@ -29,7 +31,7 @@ namespace FiniteStateAutomata.Automata.FiniteState
         
         public IAutomata<T> AddState()
         {
-            _transitions.Add(new List<int>[_alphabet.Count + 2]);
+            _transitions.Add(new List<int>[LENGTH]);
             return this;
         }
         
@@ -50,10 +52,9 @@ namespace FiniteStateAutomata.Automata.FiniteState
         
         public IAutomata<T> Concat(IAutomata<T> automata)
         {
-            int length = _alphabet.Count + 2;
             var ttable = new List<List<int>[]>();
             
-            ttable.Add(new List<int>[length]);
+            ttable.Add(new List<int>[LENGTH]);
             for(int i = 0; i < _transitions.Count; i++)
             {
                 ttable.Add(new List<int>[length]);
@@ -67,7 +68,7 @@ namespace FiniteStateAutomata.Automata.FiniteState
             
             for(int i = 0; i < automata._transitions.Count; i++)
             {
-                ttable.Add(new List<int>[length]);
+                ttable.Add(new List<int>[LENGTH]);
                 ttable.Add(automata._transitions[i]);
             }
             
@@ -120,8 +121,42 @@ namespace FiniteStateAutomata.Automata.FiniteState
         
         public bool IsMatch(params T[] values)
         {
-            var matches = Matches(values);
-            return matches.Count > 0 && matches.ContainsKey(0) && matches[0] == values.Length - 1;
+            int find = 0, temp = 0, i = 0;;
+            var backup = new Queue<Queue<int>>();
+            var curr = new Queue<int>();
+            
+            while(i <= values.Length)
+            {
+                if(i + 1 == values.length && _transitions[curr][ACCEPTCOL] == ACCEPT) 
+                    return true;
+                
+                if(!curr.Count() > 0) 
+                {
+                    if(backup.Count() > 0)
+                    {
+                        curr = backup.Dequeue();
+                        i--;
+                    }
+                    else return false;
+                }
+                
+                temp = curr.Dequeue();
+                find = _alphabet.IndexByValue(values[i]);
+                if(find == -1) return false;
+
+                var epsilons = _transitions[temp][EPSILONCOL];
+                var nexts = _transitions[temp][find]; 
+                for(int j = 0; j < epsilons.Count; j++)
+                {
+                    nexts.Add(_transitions[temp][epsilons[i]]);
+                    if(nexts.Count() == 0) continue;
+                }
+                
+                backup.Enqueue(new Queue<int>(nexts));
+                i++;
+            }
+            
+            return false;
         }
         
         public bool EndMatch(params T[] values)
@@ -132,52 +167,129 @@ namespace FiniteStateAutomata.Automata.FiniteState
         
         public bool BeginMatch(params T[] values)
         {
-            var matches = Matches(values);
-            return matches.Count > 0 && matches.ContainsKey(0);
+            int find = 0, temp = 0, i = 0;;
+            var backup = new Queue<Queue<int>>();
+            var curr = new Queue<int>();
+            
+            while(i <= values.Length)
+            {
+                if(_transitions[curr][ACCEPTCOL] == ACCEPT) 
+                    return true;
+                
+                if(curr.Count() == 0) 
+                {
+                    if(backup.Count() > 0)
+                    {
+                        curr = backup.Dequeue();
+                        i--;
+                    }
+                    else return false;
+                }
+                
+                temp = curr.Dequeue();
+                find = _alphabet.IndexByValue(values[i]);
+                if(find == -1) return false;
+
+                var epsilons = _transitions[temp][EPSILONCOL];
+                var nexts = _transitions[temp][find];
+                for(int j = 0; j < epsilons.Count; j++)
+                {
+                    nexts.Add(_transitions[temp][epsilons[i]]);
+                    if(nexts.Count() == 0) continue;
+                }
+                
+                backup.Enqueue(new Queue<int>(nexts));
+                i++;
+            }
+            
+            return false;
         }
         
         public bool AnyMatch(params T[] values)
         {
-            return Matches(values).Count > 0;
+            int find = 0, temp = 0, i = 0;;
+            var backup = new Queue<Queue<int>>();
+            var curr = new Queue<int>();
+            
+            while(i <= values.Length)
+            {
+                if(_transitions[curr][ACCEPTCOL] == ACCEPT) 
+                    return true;
+                
+                if(!curr.Count() > 0) 
+                {
+                    if(backup.Count() > 0)
+                    {
+                        curr = backup.Dequeue();
+                        i--;
+                    }
+                    else
+                    {
+                        i++;
+                        continue;
+                    }
+                }
+                
+                temp = curr.Dequeue();
+                find = _alphabet.IndexByValue(values[i]);
+                if(find == -1) return false;
+
+                var epsilons = _transitions[temp][EPSILONCOL];
+                var nexts = _transitions[temp][find];
+                for(int j = 0; j < epsilons.Count; j++)
+                {
+                    nexts.Add(_transitions[temp][epsilons[i]]);
+                    if(nexts.Count() == 0) continue;
+                }
+                
+                backup.Enqueue(new Queue<int>(nexts));
+                i++;
+            }
+            
+            return false;
         }
         
         public Dictionary<int, int> Matches(params T[] values)
         {
             var matches = new Dictionary<int, int>();
-            int col = _transitions[0].Length - 1;
-            int start = -1, accept = -1, curr = 0;
-            var backup = new Queue<int>();
-            for(int i = 0; i < values.Length; i++)
+            int start = -1, accept = -1;
+            int find = 0, temp = 0, i = 0;;
+            var backup = new Queue<Queue<int>>();
+            var curr = new Queue<int>();
+            
+            while(i <= values.Length)
             {
-                int find = _alphabet.IndexByValue(values[i]);
-                if(find >= 0)
+                if(_transitions[curr][ACCEPTCOL] == ACCEPT) 
+                    accept = i;
+                
+                if(!curr.Count() > 0) 
                 {
-                    var temp = _transitions[curr][find];
-                    if(temp == null || !temp.Any()) find = -1;
-                    else 
+                    if(backup.Count() > 0)
                     {
-                        for(int j = 0; j < temp.Count; j++)
-                        {
-                            if(temp[j] >= 0)
-                            {
-                                if(start < 0)
-                                    start = i;
-                                if(_transitions[temp[j]][col] != null && _transitions[temp[j]][col][0] == ACCEPT)
-                                    accept = i;
-                                backup.Enqueue(curr);
-                                curr = temp[j];
-                            }
-                        }
+                        curr = backup.Dequeue();
+                        i--;
+                    }
+                    else
+                    {
+                        i++;
+                        continue;
                     }
                 }
                 
-                if(i == values.Length -1 || find == -1)
+                temp = curr.Dequeue();
+                find = _alphabet.IndexByValue(values[i]);
+                if(find == -1) return false;
+
+                var epsilons = _transitions[temp][EPSILONCOL];
+                var nexts = _transitions[temp][find];
+                for(int j = 0; j < epsilons.Count; j++)
                 {
-                    if(accept >= 0) matches.Add(start, accept);
-                    start = accept = -1;
-                    curr = backup.Count > 0 ? backup.Dequeue() : 0;
+                    nexts.Add(_transitions[temp][epsilons[i]]);
+                    if(nexts.Count() == 0) continue;
                 }
                 
+                backup.Enqueue(new Queue<int>(nexts));
+                i++;
             }
             
             return matches;
