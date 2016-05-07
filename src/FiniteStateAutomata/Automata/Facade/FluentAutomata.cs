@@ -113,7 +113,7 @@ namespace FiniteStateAutomata.Automata.Facade
             return _automata.IsMatch(values);
         }
         
-        public Dictionary<int, int> Matches(params T[] values)
+        public List<int[]> Matches(params T[] values)
         {
             return _automata.Matches(values);
         }

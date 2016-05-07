@@ -8,7 +8,54 @@ namespace FiniteStateAutomata.Console
     {
         public static void Main(string[] args)
         {
-            var alphabet = new AutomataGroupAlphabet<string>()
+            var sheepabcd = new AutomataCharAlphabet("ba!");
+            
+            var sheepttable = new int [][] 
+                                { 
+                                    new [] { 1, 0, 0 },
+                                    new [] { 0, 1, 0 },
+                                    new [] { 0, 1, 1 },
+                                    new [] { 0, 0, 0 } 
+                                };
+            var sheeptalk1 = new DeterministicAutomata(sheepabcd, sheepttable);
+            sheeptalk1.AcceptState(3);
+            
+            
+        IAutomata<T> AddState();
+        
+        IAutomata<T> AddTransition(T symbol, int fromState, int toState);
+            
+            var sheeptalk2 = new DeterministicAutomata(sheepabcd);
+            sheeptalk2.AddState();
+            sheeptalk2.AddState();
+            sheeptalk2.AddState();
+            sheeptalk2.AddState();
+            sheeptalk2.AddTransition('b', 0, 1);
+            sheeptalk2.AddTransition('a', 1, 2);
+            sheeptalk2.AddTransition('a', 2, 2);
+            sheeptalk2.AddTransition('!', 2, 3);
+            sheeptalk2.AcceptState(3);
+            
+            var sheepfactory = new AutomataFactory(sheepabcd);
+            var sheeptalk3 = sheepfactory.Deterministic()
+                                .When('b').MoveNext()
+                                .OnNext()
+                                .When('a').MoveNext()
+                                .OnNext()
+                                .When('a').Repeat()
+                                .When('!').MoveNext()
+                                .OnNext().Accept();
+                                
+            var sheeptalk4 = sheepfactory.NonDeterministic()
+                                .When('b').MoveNext()
+                                .OnNext()
+                                .When('a').MoveNext()
+                                .OnNext()
+                                .When('a').EpsilonToPrev()
+                                .When('!').MoveNext()
+                                .OnNext().Accept();
+            
+            var alphabet = new AutomataGroupAlphabet()
                                 .Add("one")
                                 .Add("two", "three", "four", "five", "six", "seven", "eight", "nine")
                                 .Add("ten", "eleven", "twelve", "thirteen", "fourteen", "sixteen", "seventeen", "eighteen", "nineteen")
@@ -17,6 +64,7 @@ namespace FiniteStateAutomata.Console
                                 .Add("cents")
                                 .Add("dollar")
                                 .Add("dollars");
+                                
             var factory = new AutomataFactory<string>(alphabet);
                 
             var a1 = factory.Deterministic()

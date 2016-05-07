@@ -13,8 +13,14 @@ namespace FiniteStateAutomata.Automata.FiniteState
         private readonly int EPSILONCOL;
         private readonly int LENGTH;
         
+        private int _acceptCount = 0;
+        private int _firstAccept = 0; 
         private IAutomataAlphabet<T> _alphabet;
-        private List<List<int>[]> _transitions;
+        private List<int?[]> _transitions;
+        
+        public bool Acceptance { get { return _acceptCount > 0; } }
+        public bool Empty { get { return _alphabet.Count > 0; } }
+        public bool Totality { get { return _acceptCount == _transitions.Length; } }
         
         private NonDeterministicAutomata(IAutomataAlphabet<T> alphabet, List<List<int>[]> transitions)
         {
@@ -28,6 +34,35 @@ namespace FiniteStateAutomata.Automata.FiniteState
         public NonDeterministicAutomata(IAutomataAlphabet<T> alphabet)
             : this(alphabet, new List<List<int>[]>())
         { }
+        
+        private List<int?> GetSubset(int?[] subset, int symbolIndex)
+        {
+            var result = new List<int?>();
+            for(int i = 0; i < subset.Length; i++)
+            {
+                result.Add(subset[i][symbolIndex]);
+                for(int i = 0; i < subset[i][EPSILONCOL].Count; i++)
+                {
+                    result.AddRange(getEpsilon(subset[i][epsilon_col]))
+                }
+            }
+
+            return result;
+        }
+        
+        private List<int> GetEpsilon(List<int> subset)
+        {
+            var result = new List<int?>();
+            for(int i = 0; i < subset.Count; i++)
+            {
+                result.Add(subset[i]);
+
+                if(!subset[EPSILONCOL].HasValue())
+                    result.AddRange(subset[EPSILONCOL]);
+            }
+
+            return result;
+        }
         
         public IAutomata<T> AddState()
         {
@@ -46,8 +81,73 @@ namespace FiniteStateAutomata.Automata.FiniteState
         
         public IAutomata<T> AcceptState(int index)
         {
+            if(index < _firstAccept)
+                _firstAccept = index;
+                
             _transitions[index][ACCEPTCOL] = new List<int>() { ACCEPT };
+            _acceptCount++;
             return this;
+        }
+        
+        public bool SubsetOf(IAutomata<T> automata)
+        {
+            return !Intersection(automata).Empty;
+        }
+        
+        public bool Equals(IAutomata<T> automata)
+        {
+            return SubsetOf(automata) && automata.SubsetOf(this);
+        }
+        
+        public DeterministicAutomata<T> ToDeterministic()
+        {
+            List<List<int>[]> _transitions;
+            var ttable = new List<int?[]>();
+            int i = 0;
+            var list = new List<int?>() { i };
+            list.AddRange(GetEpsilon(_transitions[0][EPSILONCOL]));
+            
+            while(i < ttable.Count)
+            {
+                for(int j = 0; j < _alphabet.Count; j++)
+                {
+                    var next = GetSubset(list[i], j);
+
+                    if(next.Count > 0)
+                    {
+                        temp = list.index(next);
+
+                        if(temp == -1)
+                        {
+                            temp = list.Count;
+                            
+                            list.Add(next);
+                            ttable.Add(new int?[LENGTH]);
+                        }
+
+                        ttable[i][j] = temp;
+                    }
+                }
+            }
+            
+            return new DeterministicAutomata(_alphabet, ttable);
+        }
+        
+        public IAutomata<T> Reverse()
+        {
+            var ttable = new List<List<int>[]>();
+            var alphabet = _alphabet.GetNew();
+            
+            for(int i = 0; i < alphabet.Count; i++)
+                alphabet.Add(_alphabet.Count - i);
+            
+            for(int i = 0; i < _transitions.Count; i++)
+            {
+                var j = transitions.length - i
+                ttable[j][accept_col] = ACCEPT - ttable[j][accept_col]
+            }
+            
+            return new NonDeterministicAutomata(alphabet, ttable);
         }
         
         public IAutomata<T> Concat(IAutomata<T> automata)
@@ -75,8 +175,21 @@ namespace FiniteStateAutomata.Automata.FiniteState
             return new NonDeterministicAutomata(_alphabet, ttable);
         }
         
+        public IAutomata<T> Difference(IAutomata<T> automata)
+        {
+            return ToDeterministic().Difference().ToNonDeterministic();
+        }
+        
+        public IAutomata<T> Intersection(IAutomata<T> automata)
+        {
+            return ToDeterministic().Intersection().ToNonDeterministic();
+        }
+        
         public IAutomata<T> Union(IAutomata<T> automata)
         {
+            if(Empty || automata.Empty) 
+                return this;
+                
             int length = _alphabet.Count + 2;
             var ttable = new List<List<int>[]>();
             
@@ -101,6 +214,9 @@ namespace FiniteStateAutomata.Automata.FiniteState
         
         public IAutomata<T> Closure()
         {
+            if(Empty || automata.Empty) 
+                return this;
+                
             int length = _alphabet.Count + 2;
             var ttable = new List<List<int>[]>();
             
@@ -121,6 +237,8 @@ namespace FiniteStateAutomata.Automata.FiniteState
         
         public bool IsMatch(params T[] values)
         {
+            if(values.Length < _firstAccept) return false;
+            
             int find = 0, temp = 0, i = 0;;
             var backup = new Queue<Queue<int>>();
             var curr = new Queue<int>();
@@ -167,6 +285,8 @@ namespace FiniteStateAutomata.Automata.FiniteState
         
         public bool BeginMatch(params T[] values)
         {
+            if(values.Length < _firstAccept) return false;
+            
             int find = 0, temp = 0, i = 0;;
             var backup = new Queue<Queue<int>>();
             var curr = new Queue<int>();
@@ -207,6 +327,8 @@ namespace FiniteStateAutomata.Automata.FiniteState
         
         public bool AnyMatch(params T[] values)
         {
+            if(values.Length < _firstAccept) return false;
+            
             int find = 0, temp = 0, i = 0;;
             var backup = new Queue<Queue<int>>();
             var curr = new Queue<int>();
@@ -249,9 +371,11 @@ namespace FiniteStateAutomata.Automata.FiniteState
             return false;
         }
         
-        public Dictionary<int, int> Matches(params T[] values)
+        public List<int[]> Matches(params T[] values)
         {
-            var matches = new Dictionary<int, int>();
+            if(values.Length < _firstAccept) return false;
+            
+            var matches = new List<int[]>();
             int start = -1, accept = -1;
             int find = 0, temp = 0, i = 0;;
             var backup = new Queue<Queue<int>>();

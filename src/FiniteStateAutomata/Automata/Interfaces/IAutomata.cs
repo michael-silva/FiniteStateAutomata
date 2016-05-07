@@ -18,13 +18,7 @@ namespace FiniteStateAutomata.Automata.Interfaces
         
         bool IsMatch(params T[] values);
         
-        bool AnyMatch(params T[] values);
-        
-        bool EndMatch(params T[] values);
-        
-        bool BeginMatch(params T[] values);
-        
-        Dictionary<int, int> Matches(params T[] values);
+        List<int[]> Matches(params T[] values);
         
         
     }
