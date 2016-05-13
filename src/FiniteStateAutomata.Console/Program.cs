@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FiniteStateAutomata.Automata.FiniteState;
 using FiniteStateAutomata.Automata.Alphabet;
 using FiniteStateAutomata.Automata.Facade;
@@ -8,54 +9,92 @@ namespace FiniteStateAutomata.Console
     {
         public static void Main(string[] args)
         {
-            var sheepabcd = new AutomataCharAlphabet("ba!");
+            /** Exemplo 1 **/
+            //Alfabeto de caracteres 
+            var sheepabcd1 = new AutomataCharAlphabet("ba!");
             
-            var sheepttable = new int [][] 
+            //Transition table é uma matriz de inteiros
+            var sheepttable = new List<int?[]>() 
                                 { 
-                                    new [] { 1, 0, 0 },
-                                    new [] { 0, 1, 0 },
-                                    new [] { 0, 1, 1 },
-                                    new [] { 0, 0, 0 } 
+                                    new int?[] { 1, null, null },
+                                    new int?[] { null, 2, null },
+                                    new int?[] { null, 2, 3 },
+                                    new int?[] { null, null, null } 
                                 };
-            var sheeptalk1 = new DeterministicAutomata(sheepabcd, sheepttable);
+            //Instanciação do automata com um alfabeto e uma trasition table
+            var sheeptalk1 = new DeterministicAutomata<char>(sheepabcd1, sheepttable);
+            
+            //Define o 4º estado como aceito
             sheeptalk1.AcceptState(3);
             
+            //Testando o automata
+            var accept1 = sheeptalk1.IsMatch("baaa!".ToCharArray());
+            var reject1 = sheeptalk1.IsMatch("bbaa!".ToCharArray());
             
-        IAutomata<T> AddState();
-        
-        IAutomata<T> AddTransition(T symbol, int fromState, int toState);
+            //Exibir resultado 
+            System.Console.WriteLine($"Exemplo 1");
+            System.Console.WriteLine($"'baaa!' is {accept1}");
+            System.Console.WriteLine($"'bbaa!' is {reject1}");
             
-            var sheeptalk2 = new DeterministicAutomata(sheepabcd);
+            
+            /** Exemplo 2 **/
+            //Alfabeto de caracteres 
+            var sheepabcd2 = new AutomataCharAlphabet("ba!");
+            
+            //Instanciação do automata sem transition table
+            var sheeptalk2 = new DeterministicAutomata<char>(sheepabcd2);
+            
+            //Adicionando estados
             sheeptalk2.AddState();
             sheeptalk2.AddState();
             sheeptalk2.AddState();
             sheeptalk2.AddState();
+            
+            //Adicionando transições
             sheeptalk2.AddTransition('b', 0, 1);
             sheeptalk2.AddTransition('a', 1, 2);
             sheeptalk2.AddTransition('a', 2, 2);
             sheeptalk2.AddTransition('!', 2, 3);
+            
+            //Define o 4º estado como aceito
             sheeptalk2.AcceptState(3);
             
-            var sheepfactory = new AutomataFactory(sheepabcd);
+            //Testando o automata
+            var accept2 = sheeptalk2.IsMatch("baaa!".ToCharArray());
+            var reject2 = sheeptalk2.IsMatch("bbaa!".ToCharArray());
+            
+            //Exibir resultado 
+            System.Console.WriteLine($"Exemplo 2");
+            System.Console.WriteLine($"'baaa!' is {accept2}");
+            System.Console.WriteLine($"'bbaa!' is {reject2}");
+            
+            /** Exemplo 3 **/
+            //Alfabeto de caracteres 
+            var sheepabcd3 = new AutomataCharAlphabet("ba!");
+            
+            //Factory para criação de automatas através de interface fluente 
+            var sheepfactory = new AutomataFactory<char>(sheepabcd3);
+            
+            //Definição dos estados e suas transições através de um Fluent Facade 
             var sheeptalk3 = sheepfactory.Deterministic()
-                                .When('b').MoveNext()
+                                .When('b').ToNext()
                                 .OnNext()
-                                .When('a').MoveNext()
+                                .When('a').ToNext()
                                 .OnNext()
                                 .When('a').Repeat()
-                                .When('!').MoveNext()
-                                .OnNext().Accept();
-                                
-            var sheeptalk4 = sheepfactory.NonDeterministic()
-                                .When('b').MoveNext()
-                                .OnNext()
-                                .When('a').MoveNext()
-                                .OnNext()
-                                .When('a').EpsilonToPrev()
-                                .When('!').MoveNext()
+                                .When('!').ToNext()
                                 .OnNext().Accept();
             
-            var alphabet = new AutomataGroupAlphabet()
+            //Testando o automata
+            var accept3 = sheeptalk3.IsMatch("baaa!".ToCharArray());
+            var reject3 = sheeptalk3.IsMatch("bbaa!".ToCharArray());
+            
+            //Exibir resultado 
+            System.Console.WriteLine($"Exemplo 3");
+            System.Console.WriteLine($"'baaa!' is {accept3}");
+            System.Console.WriteLine($"'bbaa!' is {reject3}");
+                               
+            var alphabet = new AutomataGroupAlphabet<string>()
                                 .Add("one")
                                 .Add("two", "three", "four", "five", "six", "seven", "eight", "nine")
                                 .Add("ten", "eleven", "twelve", "thirteen", "fourteen", "sixteen", "seventeen", "eighteen", "nineteen")
@@ -105,7 +144,7 @@ namespace FiniteStateAutomata.Console
             
             System.Console.WriteLine($"{m1}, {m2}, {m3}, {m4}, {m5}, {m6}, {m7}");
             
-            var a2 = factory.NonDeterministic()
+            /*var a2 = factory.NonDeterministic()
                             .When("one").To("q2a")
                             .When("two").To("q2")
                             .When("ten").To("q2")
@@ -141,7 +180,7 @@ namespace FiniteStateAutomata.Console
             var n6 = a2.IsMatch("five dollars".Split(' '));
             var n7 = a2.IsMatch("thirteen dollars one cent".Split(' '));
             
-            System.Console.WriteLine($"{n1}, {n2}, {n3}, {n4}, {n5}, {n6}, {n7}");
+            System.Console.WriteLine($"{n1}, {n2}, {n3}, {n4}, {n5}, {n6}, {n7}");*/
             
             System.Console.WriteLine("Hello World");
             System.Console.Read();

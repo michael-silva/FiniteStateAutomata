@@ -20,22 +20,16 @@ namespace FiniteStateAutomata.Automata.Facade
             return new FluentAutomata<T>(a);
         }
         
-        public FluentAutomata<T> NonDeterministic()
+        /*public FluentAutomata<T> NonDeterministic()
         {
             var a =  new NonDeterministicAutomata<T>(_alphabet);
             return new FluentAutomata<T>(a);
         }
         
-        public FluentAutomata<T> EpsilonNonDeterministic()
-        {
-            var a = new EpsilonNonDeterministicAutomata<T>(_alphabet);
-            return new FluentAutomata<T>(a);
-        }
-        
-        public FluentAutomata<T> RegularExpression()
+        /*public FluentAutomata<T> RegularExpression()
         {
             var a = new RegularExpressionAutomata<T>(_alphabet);
             return new FluentAutomata<T>(a);
-        }
+        }*/
     }   
 }

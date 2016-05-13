@@ -6,8 +6,8 @@ using FiniteStateAutomata.Automata.Alphabet;
 
 namespace FiniteStateAutomata.Automata.FiniteState
 {
-    public class NonDeterministicAutomata<T> : IAutomata<T>
-    {
+    public class NonDeterministicAutomata<T> //: IAutomata<T>
+    {/*
         private const int ACCEPT = 1;
         private readonly int ACCEPTCOL;
         private readonly int EPSILONCOL;
@@ -43,7 +43,7 @@ namespace FiniteStateAutomata.Automata.FiniteState
                 result.Add(subset[i][symbolIndex]);
                 for(int i = 0; i < subset[i][EPSILONCOL].Count; i++)
                 {
-                    result.AddRange(getEpsilon(subset[i][epsilon_col]))
+                    result.AddRange(getEpsilon(subset[i][epsilon_col]));
                 }
             }
 
@@ -143,8 +143,8 @@ namespace FiniteStateAutomata.Automata.FiniteState
             
             for(int i = 0; i < _transitions.Count; i++)
             {
-                var j = transitions.length - i
-                ttable[j][accept_col] = ACCEPT - ttable[j][accept_col]
+                var j = transitions.length - i;
+                ttable[j][accept_col] = ACCEPT - ttable[j][accept_col];
             }
             
             return new NonDeterministicAutomata(alphabet, ttable);
@@ -417,6 +417,6 @@ namespace FiniteStateAutomata.Automata.FiniteState
             }
             
             return matches;
-        }
+        }*/
     }
 }
