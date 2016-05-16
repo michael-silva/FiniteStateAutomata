@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CBD05303-3090-4956-8D1C-ED90C6F31700}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{83145C9A-E353-4020-9B84-9F2618CC9B11}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".notes", ".notes", "{7EDF6976-6189-4713-87FB-ED99F7FD09F4}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Automata.Console", "src\Automata.Console\Automata.Console.xproj", "{FED6CF00-87CC-493F-A887-95308E58EFF3}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Automata.Core", "src\Automata.Core\Automata.Core.xproj", "{85D76614-9F4F-4A5E-BB2E-1DFF1E9DF974}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Automata.Test", "test\Automata.Test\Automata.Test.xproj", "{665A4F8B-277E-4C05-BED2-89BBA5C2A7AF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FED6CF00-87CC-493F-A887-95308E58EFF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FED6CF00-87CC-493F-A887-95308E58EFF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FED6CF00-87CC-493F-A887-95308E58EFF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FED6CF00-87CC-493F-A887-95308E58EFF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85D76614-9F4F-4A5E-BB2E-1DFF1E9DF974}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85D76614-9F4F-4A5E-BB2E-1DFF1E9DF974}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85D76614-9F4F-4A5E-BB2E-1DFF1E9DF974}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85D76614-9F4F-4A5E-BB2E-1DFF1E9DF974}.Release|Any CPU.Build.0 = Release|Any CPU
+		{665A4F8B-277E-4C05-BED2-89BBA5C2A7AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{665A4F8B-277E-4C05-BED2-89BBA5C2A7AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{665A4F8B-277E-4C05-BED2-89BBA5C2A7AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{665A4F8B-277E-4C05-BED2-89BBA5C2A7AF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FED6CF00-87CC-493F-A887-95308E58EFF3} = {CBD05303-3090-4956-8D1C-ED90C6F31700}
+		{85D76614-9F4F-4A5E-BB2E-1DFF1E9DF974} = {CBD05303-3090-4956-8D1C-ED90C6F31700}
+		{665A4F8B-277E-4C05-BED2-89BBA5C2A7AF} = {83145C9A-E353-4020-9B84-9F2618CC9B11}
+	EndGlobalSection
+EndGlobal
