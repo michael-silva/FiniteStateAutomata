@@ -5,6 +5,8 @@ namespace Automata.Core.Interfaces
 {
     public interface IAutomata //: IComparable
     {
+        IAutomata Clone();
+
         IAutomataAlphabet Alphabet { get; }
         
         bool Acceptance { get; }

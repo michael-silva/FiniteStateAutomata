@@ -18,10 +18,10 @@ namespace Automata.Core.Facade
             : this(new AutomataCharAlphabet(symbols))
         { }
         
-        public AutomataModel Deterministic()
+        public AutomataModel<DeterministicAutomata> Deterministic()
         {
             var a = new DeterministicAutomata(_alphabet);
-            return new AutomataModel(a);
+            return new AutomataModel<DeterministicAutomata>(a);
         }
         
         /*public FluentAutomata<T> NonDeterministic()

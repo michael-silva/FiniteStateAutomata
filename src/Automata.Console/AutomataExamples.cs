@@ -63,7 +63,52 @@ namespace Automata.Console
                                 .OnNext().Accept();
                                 
             //Getting a automata from model
-            return (DeterministicAutomata)sheepmodel.CreateAutomata();
+            return sheepmodel.CreateAutomata();
+        }
+
+        public static DeterministicAutomata GetAutomata4()
+        {
+            var alphabet = new AutomataGroupAlphabet()
+                                .Add("one")
+                                .Add("two", "three", "four", "five", "six", "seven", "eight", "nine")
+                                .Add("ten", "eleven", "twelve", "thirteen", "fourteen", "sixteen", "seventeen", "eighteen", "nineteen")
+                                .Add("twenty", "thirty", "fourty", "fifity", "sixty", "seventy", "eighty", "ninety")
+                                .Add("cent")
+                                .Add("cents")
+                                .Add("dollar")
+                                .Add("dollars");
+
+            var factory = new AutomataFactory(alphabet);
+
+            var model = factory.Deterministic()
+                            .When("one").To("q2a")
+                            .When("two").To("q2")
+                            .When("ten").To("q2")
+                            .When("twenty").To("q1")
+                        .On("q1").Accept()
+                            .When("one").To("q2")
+                            .When("two").To("q2")
+                        .On("q2a")
+                            .When("cent").To("q7")
+                            .When("dollar").To("q4")
+                        .On("q2")
+                            .When("cents").To("q7")
+                            .When("dollars").To("q4")
+                        .On("q4").Accept()
+                            .When("one").To("q6a")
+                            .When("two").To("q6")
+                            .When("ten").To("q6")
+                            .When("twenty").To("q5")
+                        .On("q5").Accept()
+                            .When("one").To("q6")
+                            .When("two").To("q6")
+                        .On("q6a")
+                            .When("cent").To("q7")
+                        .On("q6")
+                            .When("cents").To("q7")
+                        .On("q7").Accept();
+
+            return model.CreateAutomata();
         }
     }
 }

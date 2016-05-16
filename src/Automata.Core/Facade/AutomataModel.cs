@@ -6,7 +6,8 @@ using Automata.Core.Interfaces;
 
 namespace Automata.Core.Facade
 {
-    public class AutomataModel
+    public class AutomataModel<T>
+        where T : IAutomata
     {
         private IAutomata _automata;
         private List<string> _states;
@@ -35,7 +36,7 @@ namespace Automata.Core.Facade
             CreateState("");
         }
         
-        public AutomataModel When(string value)
+        public AutomataModel<T> When(string value)
         {
             var index = _automata.Alphabet.IndexOf(value);
             if(index == -1) 
@@ -45,71 +46,71 @@ namespace Automata.Core.Facade
             return this;
         }
         
-        public AutomataModel ToNext()
+        public AutomataModel<T> ToNext()
         {
             _automata.AddTransition(_currSymbol, _currState, _currState + 1);
             return this;
         }
         
-        public AutomataModel ToPrev()
+        public AutomataModel<T> ToPrev()
         {
             _automata.AddTransition(_currSymbol, _currState, _currState - 1);
             return this;
         }
         
-        public AutomataModel To(string name)
+        public AutomataModel<T> To(string name)
         {
             int to = IndexOfState(name);
             _automata.AddTransition(_currSymbol, _currState, to);
             return this;
         }
         
-        public AutomataModel ToFirst()
+        public AutomataModel<T> ToFirst()
         {
             _automata.AddTransition(_currSymbol, _currState, 0);
             return this;
         }
         
-        public AutomataModel OnNext()
+        public AutomataModel<T> OnNext()
         {
             _currState++;
             return this;
         }
         
-        public AutomataModel OnPrev()
+        public AutomataModel<T> OnPrev()
         {
             _currState--;
             return this;
         }
         
-        public AutomataModel OnFirst()
+        public AutomataModel<T> OnFirst()
         {
             _currState = 0;
             return this;
         }
         
-        public AutomataModel On(string name)
+        public AutomataModel<T> On(string name)
         {
             int to = IndexOfState(name);
             _currState = to;
             return this;
         }
         
-        public AutomataModel Repeat()
+        public AutomataModel<T> Repeat()
         {
             _automata.AddTransition(_currSymbol, _currState, _currState);
             return this;
         }
         
-        public AutomataModel Accept()
+        public AutomataModel<T> Accept()
         {
             _automata.AcceptState(_currState);
             return this;
         }
         
-        public IAutomata CreateAutomata()
+        public T CreateAutomata()
         {
-            return _automata;
+            return (T)_automata.Clone();
         }
     }   
 }

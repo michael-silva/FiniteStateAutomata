@@ -42,7 +42,7 @@ namespace Automata.Core.FiniteState
             : this(new AutomataCharAlphabet(symbols), null)
         { }
         
-        public DeterministicAutomata Clone()
+        public IAutomata Clone()
         {   
             return new DeterministicAutomata(_alphabet, new List<int?[]>(_transitions.ToArray()));
         }
@@ -298,8 +298,18 @@ namespace Automata.Core.FiniteState
             if(end > -1) matches.Add(new [] { start, end });
             return matches;
         }
-        
-        public bool IsMatch(params char[] values)
+
+        public bool IsMatch(string value, char separator)
+        {
+            return IsMatch(value.Split(separator));
+        }
+
+        public bool IsMatch(string value)
+        {
+            return IsMatch(value.ToCharArray());
+        }
+
+        public bool IsMatch(char[] values)
         {
             int i = 0, j = 0, curr = 0;
             int? temp = null;
@@ -318,7 +328,27 @@ namespace Automata.Core.FiniteState
             
             return _transitions[curr][ACCEPTCOL] == ACCEPT;
         }
-        
+
+        public bool IsMatch(string[] values)
+        {
+            int i = 0, j = 0, curr = 0;
+            int? temp = null;
+            for (i = 0; i < values.Length; i++)
+            {
+                j = _alphabet.IndexOf(values[i].ToString());
+                if (j == -1)
+                    return false;
+
+                temp = _transitions[curr][j];
+                if (!temp.HasValue)
+                    return false;
+
+                curr = temp.Value;
+            }
+
+            return _transitions[curr][ACCEPTCOL] == ACCEPT;
+        }
+
         public bool BeginMatch(params string[] values)
         {
             int i = 0, j = 0, curr = 0;
