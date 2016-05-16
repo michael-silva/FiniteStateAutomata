@@ -1,4 +1,4 @@
-namespace FiniteStateAutomata.Automata.Interfaces
+namespace Automata.Core.Interfaces
 {
     public interface IAutomataTableBuilder<T>
     {

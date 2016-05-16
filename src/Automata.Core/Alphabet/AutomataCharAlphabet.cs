@@ -1,13 +1,14 @@
 using System.Collections.Generic;
-using FiniteStateAutomata.Automata.Interfaces;
+using Automata.Core.Interfaces;
+using System;
 
-namespace FiniteStateAutomata.Automata.Alphabet
+namespace Automata.Core.Alphabet
 {
-    public class AutomataCharAlphabet : IAutomataAlphabet<char>
+    public class AutomataCharAlphabet : IAutomataAlphabet
     {
         private List<char> _symbols;
         
-        public int Count { get { return _symbols.Count; } } 
+        public int Length { get { return _symbols.Count; } } 
         
         public AutomataCharAlphabet()
         {
@@ -23,10 +24,18 @@ namespace FiniteStateAutomata.Automata.Alphabet
             : this(symbols.ToCharArray())
         { }
         
-        public int IndexByValue(char value)
+        public int IndexOf(string value)
         {
-            for(int i = 0; i < Count; i++)
-                if(_symbols[i] == value) return i;
+            if(value.Length > 1)
+                throw new Exception("The char alphabet don't can get index for string value");
+            
+            return IndexOf(value[0]);
+        }
+        
+        public int IndexOf(char value)
+        {
+            for(int i = 0; i < Length; i++)
+                if(_symbols[i].Equals(value)) return i;
             
             return -1;
         }

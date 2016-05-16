@@ -1,21 +1,20 @@
 using System;
 using System.Collections.Generic;
-using FiniteStateAutomata.Automata.Alphabet;
-using FiniteStateAutomata.Automata.FiniteState;
-using FiniteStateAutomata.Automata.Interfaces;
+using Automata.Core.Alphabet;
+using Automata.Core.FiniteState;
+using Automata.Core.Interfaces;
 
-namespace FiniteStateAutomata.Automata.Facade
+namespace Automata.Core.Facade
 {
-    public class FluentAutomata<T>
+    public class AutomataModel
     {
-        private IAutomata<T> _automata;
+        private IAutomata _automata;
         private List<string> _states;
         private int _currState;
-        private T _currSymbol;
+        private int _currSymbol;
         
         private void CreateState(string name)
         {
-            _automata.AddState();
             _states.Add(name);
         }
         
@@ -25,97 +24,92 @@ namespace FiniteStateAutomata.Automata.Facade
                 if(_states[i].Equals(name)) return i;
                 
             CreateState(name);
-            return _states.Count -1;
+            return _states.Count - 1;
         }
         
-        public FluentAutomata(IAutomata<T> automata)
+        public AutomataModel(IAutomata automata)
         {
             _automata = automata;
             _currState = 0;
-            _currSymbol = default(T);
             _states = new List<string>();
             CreateState("");
         }
         
-        public FluentAutomata<T> When(T value)
+        public AutomataModel When(string value)
         {
-            if(value == null) throw new Exception($"The symbol don't exist in alphabet!");
+            var index = _automata.Alphabet.IndexOf(value);
+            if(index == -1) 
+                throw new Exception($"The symbol don't exist in alphabet!");
             
-            _currSymbol = value;
+            _currSymbol = index;
             return this;
         }
         
-        public FluentAutomata<T> ToNext()
+        public AutomataModel ToNext()
         {
             _automata.AddTransition(_currSymbol, _currState, _currState + 1);
             return this;
         }
         
-        public FluentAutomata<T> ToPrev()
+        public AutomataModel ToPrev()
         {
             _automata.AddTransition(_currSymbol, _currState, _currState - 1);
             return this;
         }
         
-        public FluentAutomata<T> To(string name)
+        public AutomataModel To(string name)
         {
             int to = IndexOfState(name);
             _automata.AddTransition(_currSymbol, _currState, to);
             return this;
         }
         
-        public FluentAutomata<T> ToFirst()
+        public AutomataModel ToFirst()
         {
             _automata.AddTransition(_currSymbol, _currState, 0);
             return this;
         }
         
-        public FluentAutomata<T> OnNext()
+        public AutomataModel OnNext()
         {
-            _automata.AddState();
             _currState++;
             return this;
         }
         
-        public FluentAutomata<T> OnPrev()
+        public AutomataModel OnPrev()
         {
             _currState--;
             return this;
         }
         
-        public FluentAutomata<T> OnFirst()
+        public AutomataModel OnFirst()
         {
             _currState = 0;
             return this;
         }
         
-        public FluentAutomata<T> On(string name)
+        public AutomataModel On(string name)
         {
             int to = IndexOfState(name);
             _currState = to;
             return this;
         }
         
-        public FluentAutomata<T> Repeat()
+        public AutomataModel Repeat()
         {
             _automata.AddTransition(_currSymbol, _currState, _currState);
             return this;
         }
         
-        public FluentAutomata<T> Accept()
+        public AutomataModel Accept()
         {
             _automata.AcceptState(_currState);
             return this;
         }
         
-        public bool IsMatch(params T[] values)
+        public IAutomata CreateAutomata()
         {
-            return _automata.IsMatch(values);
-        }
-        
-        public List<int[]> Matches(params T[] values)
-        {
-            return _automata.Matches(values);
+            return _automata;
         }
     }   
 }

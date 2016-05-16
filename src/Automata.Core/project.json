@@ -1,12 +1,12 @@
 {
   "version": "1.0.0-*",
-  "description": "FiniteStateAutomata Class Library",
+  "description": "Automata Class Library",
   "authors": [ "Class Library template" ],
   "tags": [""],
   "projectUrl": "",
   "licenseUrl": "",
   "tooling": {
-    "defaultNamespace": "FiniteStateAutomata"
+    "defaultNamespace": "Automata"
   },
 
   "frameworks": {

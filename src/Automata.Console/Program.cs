@@ -1,89 +1,67 @@
 using System.Collections.Generic;
-using FiniteStateAutomata.Automata.FiniteState;
-using FiniteStateAutomata.Automata.Alphabet;
-using FiniteStateAutomata.Automata.Facade;
+using Automata.Core.FiniteState;
+using Automata.Core.Alphabet;
+using Automata.Core.Facade;
 
-namespace FiniteStateAutomata.Console
+namespace Automata.Console
 {
     public class Program
     {
         public static void Main(string[] args)
         {
-            /** Exemplo 1 **/
-            //Alfabeto de caracteres 
-            var sheepabcd1 = new AutomataCharAlphabet("ba!");
-            
-            //Transition table é uma matriz de inteiros
-            var sheepttable = new List<int?[]>() 
-                                { 
-                                    new int?[] { 1, null, null },
-                                    new int?[] { null, 2, null },
-                                    new int?[] { null, 2, 3 },
-                                    new int?[] { null, null, null } 
-                                };
-            //Instanciação do automata com um alfabeto e uma trasition table
-            var sheeptalk1 = new DeterministicAutomata<char>(sheepabcd1, sheepttable);
-            
-            //Define o 4º estado como aceito
-            sheeptalk1.AcceptState(3);
-            
+            /*
+			Separar exemplos de teste, onte exemplo tem um accept e um reject e teste tem muuuitos accept e muiiitos reject
+			Exemplo de alphabet com FSA de conjugação do verbo
+			Um Exemplo de cada operação
+			Todos os exemplos em NonDeterminitic
+			Exemplos de regex comum como validação de email e cpf
+			Exemplos de Cast entre os 3 automatas
+			*/
+			            
+			/** Exemplo 1 **/
+			//Método de exemplo para criação de automata
+            var sheeptalk1 = AutomataExamples.GetAutomata1();
+			
             //Testando o automata
-            var accept1 = sheeptalk1.IsMatch("baaa!".ToCharArray());
-            var reject1 = sheeptalk1.IsMatch("bbaa!".ToCharArray());
+            bool accept1 = sheeptalk1.IsMatch("baaa!".ToCharArray()); //Match consecutive string
+            bool reject1 = sheeptalk1.IsMatch("bbaa!".ToCharArray());
             
             //Exibir resultado 
             System.Console.WriteLine($"Exemplo 1");
             System.Console.WriteLine($"'baaa!' is {accept1}");
-            System.Console.WriteLine($"'bbaa!' is {reject1}");
+            System.Console.WriteLine($"'bbaa!' is {reject1}");            
             
-            
-            /** Exemplo 2 **/
-            //Alfabeto de caracteres 
-            var sheepabcd2 = new AutomataCharAlphabet("ba!");
-            
-            //Instanciação do automata sem transition table
-            var sheeptalk2 = new DeterministicAutomata<char>(sheepabcd2);
-            
-            //Adicionando estados
-            sheeptalk2.AddState();
-            sheeptalk2.AddState();
-            sheeptalk2.AddState();
-            sheeptalk2.AddState();
-            
-            //Adicionando transições
-            sheeptalk2.AddTransition('b', 0, 1);
-            sheeptalk2.AddTransition('a', 1, 2);
-            sheeptalk2.AddTransition('a', 2, 2);
-            sheeptalk2.AddTransition('!', 2, 3);
-            
-            //Define o 4º estado como aceito
-            sheeptalk2.AcceptState(3);
+            /** Exemplo 2 **/            
+			//Método de exemplo para criação de automata
+            var sheeptalk2 = AutomataExamples.GetAutomata2();
             
             //Testando o automata
-            var accept2 = sheeptalk2.IsMatch("baaa!".ToCharArray());
-            var reject2 = sheeptalk2.IsMatch("bbaa!".ToCharArray());
+            var accept2 = sheeptalk2.IsMatch("baaa!".ToCharArray());;
+            var reject2 = sheeptalk2.IsMatch("baaa!".ToCharArray());;
             
             //Exibir resultado 
             System.Console.WriteLine($"Exemplo 2");
             System.Console.WriteLine($"'baaa!' is {accept2}");
             System.Console.WriteLine($"'bbaa!' is {reject2}");
             
-            /** Exemplo 3 **/
+            /** Exemplo 3 **/            
+			//Método de exemplo para criação de automata
+            var sheeptalk3 = AutomataExamples.GetAutomata3();
+            
+            //Testando o automata
+            var accept3 = sheeptalk3.IsMatch("baaa!".ToCharArray());;
+            var reject3 = sheeptalk3.IsMatch("baaa!".ToCharArray());;
+            
+            //Exibir resultado 
+            System.Console.WriteLine($"Exemplo 3");
+            System.Console.WriteLine($"'baaa!' is {accept3}");
+            System.Console.WriteLine($"'bbaa!' is {reject3}");
+            
+            /*
+            /** Exemplo 3 **
             //Alfabeto de caracteres 
             var sheepabcd3 = new AutomataCharAlphabet("ba!");
             
-            //Factory para criação de automatas através de interface fluente 
-            var sheepfactory = new AutomataFactory<char>(sheepabcd3);
-            
-            //Definição dos estados e suas transições através de um Fluent Facade 
-            var sheeptalk3 = sheepfactory.Deterministic()
-                                .When('b').ToNext()
-                                .OnNext()
-                                .When('a').ToNext()
-                                .OnNext()
-                                .When('a').Repeat()
-                                .When('!').ToNext()
-                                .OnNext().Accept();
             
             //Testando o automata
             var accept3 = sheeptalk3.IsMatch("baaa!".ToCharArray());

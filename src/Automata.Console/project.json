@@ -1,6 +1,6 @@
 {
   "version": "1.0.0-*",
-  "description": "FiniteStateAutomata.Console Console Application",
+  "description": "Automata Console Application",
   "authors": [ "" ],
   "tags": [ "" ],
   "projectUrl": "",
@@ -11,15 +11,15 @@
   },
 
   "tooling": {
-    "defaultNamespace": "FiniteStateAutomata.Console"
+    "defaultNamespace": "Automata.Console"
   },
 
   "dependencies": {
-      "FiniteStateAutomata": "1.0.0-*"
+      "Automata.Core": "1.0.0-*"
   },
 
   "commands": {
-    "FiniteStateAutomata.Console": "FiniteStateAutomata.Console"
+    "Automata.Console": "Automata.Console"
   },
 
   "frameworks": {

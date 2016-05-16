@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using FiniteStateAutomata.Automata.Interfaces;
-using FiniteStateAutomata.Automata.Alphabet;
+using Automata.Core.Interfaces;
+using Automata.Core.Alphabet;
 
-namespace FiniteStateAutomata.Automata.FiniteState
+namespace Automata.Core.FiniteState
 {
     public class NonDeterministicAutomata<T> //: IAutomata<T>
     {/*

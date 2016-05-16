@@ -1,23 +1,27 @@
-using System;
 using System.Collections.Generic;
-using FiniteStateAutomata.Automata.FiniteState;
-using FiniteStateAutomata.Automata.Interfaces;
+using Automata.Core.FiniteState;
+using Automata.Core.Alphabet;
+using Automata.Core.Interfaces;
 
-namespace FiniteStateAutomata.Automata.Facade
+namespace Automata.Core.Facade
 {
-    public class AutomataFactory<T>
+    public class AutomataFactory
     {
-        private IAutomataAlphabet<T> _alphabet;
+        private IAutomataAlphabet _alphabet;
         
-        public AutomataFactory(IAutomataAlphabet<T> alphabet)
+        public AutomataFactory(IAutomataAlphabet alphabet)
         {
             _alphabet = alphabet;
         }
         
-        public FluentAutomata<T> Deterministic()
+        public AutomataFactory(string symbols)
+            : this(new AutomataCharAlphabet(symbols))
+        { }
+        
+        public AutomataModel Deterministic()
         {
-            var a = new DeterministicAutomata<T>(_alphabet);
-            return new FluentAutomata<T>(a);
+            var a = new DeterministicAutomata(_alphabet);
+            return new AutomataModel(a);
         }
         
         /*public FluentAutomata<T> NonDeterministic()
