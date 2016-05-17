@@ -1,0 +1,17 @@
+{
+    "version": "0.1.0",
+    "command": "dmcs",
+    "args": [
+        "-d:DEBUG",
+        "src/Automata.Console/Program.cs"
+    ],  
+    "showOutput": "silent",
+    "taskSelector": "/t:",
+    "tasks": [
+        {
+            "taskName": "exe",
+            "isBuildCommand": true,
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}

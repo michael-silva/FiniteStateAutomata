@@ -5,11 +5,12 @@
   "tags": [ "" ],
   "projectUrl": "",
   "licenseUrl": "",
-
+  
   "compilationOptions": {
-    "emitEntryPoint": true
-  },
-
+        "emitEntryPoint": true,
+        "debugType": "portable"
+    },
+  
   "tooling": {
     "defaultNamespace": "Automata.Console"
   },
