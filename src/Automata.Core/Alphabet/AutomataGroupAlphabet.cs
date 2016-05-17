@@ -19,12 +19,26 @@ namespace Automata.Core.Alphabet
         {
             _symbols = new List<AlphabetGroupSymbol>(symbols);
         }
-        
-        public int IndexOf(string value)
+
+        public int IndexOf(IComparable key)
         {
-            for(int i = 0; i < Length; i++)
-                if(_symbols[i].HasValue(value)) return i;
-            
+            if (key != null)
+            {
+                for (int i = 0; i < Length; i++)
+                    if (_symbols[i].Key.Equals(key)) return i;
+            }
+
+            return -1;
+        }
+
+        public int IndexOfValue(IComparable value)
+        {
+            if (value != null)
+            {
+                for (int i = 0; i < Length; i++)
+                    if (_symbols[i].HasValue(value)) return i;
+            }
+
             return -1;
         }
         
@@ -34,11 +48,21 @@ namespace Automata.Core.Alphabet
             return this;
         }
         
-        public AutomataGroupAlphabet Add(params string[] values)
+        public AutomataGroupAlphabet Add(string key, string[] values)
         {
-            return Add(new AlphabetGroupSymbol(values));
+            return Add(new AlphabetGroupSymbol(key, values));
         }
-        
+
+        public AutomataGroupAlphabet Add(string key, char[] values)
+        {
+            return Add(new AlphabetGroupSymbol(key, values));
+        }
+
+        public AutomataGroupAlphabet Add(string key)
+        {
+            return Add(new AlphabetGroupSymbol(key, new[] { key }));
+        }
+
         /*
         public AutomataGroupAlphabet Add(params Automata[] values)
         {

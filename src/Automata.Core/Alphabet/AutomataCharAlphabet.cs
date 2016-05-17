@@ -23,20 +23,20 @@ namespace Automata.Core.Alphabet
         public AutomataCharAlphabet(string symbols)
             : this(symbols.ToCharArray())
         { }
-        
-        public int IndexOf(string value)
+
+        public int IndexOfValue(IComparable value)
         {
-            if(value.Length > 1)
-                throw new Exception("The char alphabet don't can get index for string value");
-            
-            return IndexOf(value[0]);
+            return IndexOf(value);
         }
-        
-        public int IndexOf(char value)
+
+        public int IndexOf(IComparable key)
         {
-            for(int i = 0; i < Length; i++)
-                if(_symbols[i].Equals(value)) return i;
-            
+            if (key != null)
+            {
+                for (int i = 0; i < Length; i++)
+                    if (_symbols[i].Equals(key)) return i;
+            }
+
             return -1;
         }
         

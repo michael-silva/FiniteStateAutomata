@@ -35,17 +35,27 @@ namespace Automata.Core.Facade
             _states = new List<string>();
             CreateState("");
         }
-        
-        public AutomataModel<T> When(string value)
+
+        private AutomataModel<T> When(int index, IComparable value)
         {
-            var index = _automata.Alphabet.IndexOf(value);
-            if(index == -1) 
-                throw new Exception($"The symbol don't exist in alphabet!");
-            
+            if (index == -1)
+                throw new Exception($"The symbol '{value}' don't exist in alphabet!");
+
             _currSymbol = index;
             return this;
         }
-        
+        public AutomataModel<T> When(string value)
+        {
+            var index = _automata.Alphabet.IndexOf(value);
+            return When(index, value);
+        }
+
+        public AutomataModel<T> When(char value)
+        {
+            var index = _automata.Alphabet.IndexOf(value);
+            return When(index, value);
+        }
+
         public AutomataModel<T> ToNext()
         {
             _automata.AddTransition(_currSymbol, _currState, _currState + 1);

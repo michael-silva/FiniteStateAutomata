@@ -21,29 +21,22 @@ namespace Automata.Core.Alphabet
             for(int i = 0; i < symbols.Length; i++)
                 _symbols.Add(symbols[i]);
         }
-        
-        /*public AutomataAlphabet(params IAutomata[] symbols)
-            : this()
+
+        public int IndexOfValue(IComparable value)
         {
-            for(int i = 0; i < symbols.Length; i++)
-                _symbols.Add(symbols[i]);
-        }*/
-        
-        public int IndexOf(string value)
+            return IndexOf(value);
+        }
+
+        public int IndexOf(IComparable key)
         {
-            if(!string.IsNullOrWhiteSpace(value))
+            if(key != null)
             {
                 for(int i = 0; i < Length; i++)
-                    if(_symbols[i].Equals(value)) return i;
+                    if(_symbols[i].Equals(key)) return i;
             }
             
             return -1;
         }
-        
-        /*public AutomataAlphabet Add(IAutomata symbol)
-        {
-            return Add(symbol);
-        }*/
         
         public AutomataAlphabet Add(string symbol)
         {

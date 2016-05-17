@@ -8,6 +8,7 @@ namespace Automata.Core.FiniteState
 {
     public class DeterministicAutomata : IAutomata
     {
+        #region Properties and Constants
         private const int ACCEPT = 1;
         private readonly int ACCEPTCOL;
         private readonly int LENGTH;
@@ -21,7 +22,9 @@ namespace Automata.Core.FiniteState
         public bool Acceptance { get { return _acceptCount > 0; } }
         public bool Empty { get { return _alphabet.Length > 0; } }
         public bool Totality { get { return _acceptCount == _transitions.Count; } }
-        
+        #endregion
+
+        #region Constructors
         public DeterministicAutomata(IAutomataAlphabet alphabet, List<int?[]> transitions)
         {
             ACCEPTCOL = alphabet.Length;
@@ -41,12 +44,9 @@ namespace Automata.Core.FiniteState
         public DeterministicAutomata(string symbols)
             : this(new AutomataCharAlphabet(symbols), null)
         { }
-        
-        public IAutomata Clone()
-        {   
-            return new DeterministicAutomata(_alphabet, new List<int?[]>(_transitions.ToArray()));
-        }
-        
+        #endregion
+
+        #region Build Transitions Table methods
         public DeterministicAutomata State(params int?[] values)
         {
             if(values == null || values.Length != _alphabet.Length) 
@@ -73,7 +73,7 @@ namespace Automata.Core.FiniteState
         
         public void AddTransition(char symbol, int fromState, int toState)
         {
-            int index = _alphabet.IndexOf(symbol.ToString());
+            int index = _alphabet.IndexOf(symbol);
             AddTransition(index, fromState, toState);
         }
         
@@ -82,13 +82,7 @@ namespace Automata.Core.FiniteState
             int index = _alphabet.IndexOf(symbol);
             AddTransition(index, fromState, toState);
         }
-        
-        /*public void AddTransition(IAutomata symbol, int fromState, int toState)
-        {
-            int index = _alphabet.IndexOf(symbol);
-            AddTransition(index, fromState, toState);
-        }*/
-        
+                
         public void AcceptState(int index)
         {
             if(index < _firstAccept)
@@ -103,33 +97,9 @@ namespace Automata.Core.FiniteState
             int index = _transitions.Count - 1;
             AcceptState(index);
         }
-        
-        public NonDeterministicAutomata<IComparable> ToNonDeterministic()
-        {
-            var ttable = new List<List<int>[]>();
-            for(int i = 0; i < _transitions.Count; i++)
-            {
-                ttable.Add(new List<int>[LENGTH]);
-                for(int j = 0; j < LENGTH; j++)
-                {
-                    //ttable[i][j] = new List<int>() { _transitions[i][j] };
-                }
-            }
-            
-            return null;//new NonDeterministicAutomata(_alphabet, ttable);
-        }
-        
-        public DeterministicAutomata Optimize()
-        {
-            //inject optimize algorithm
-            return this;
-        }
-        
-        public DeterministicAutomata Reverse()
-        {
-            return this;//ToNonDeterministic().Reverse().ToDeterministic().Optimize();
-        }
-        
+        #endregion
+
+        #region Operations methods        
         public DeterministicAutomata Intersection(DeterministicAutomata automata)
         {
             if(Empty || automata.Empty) 
@@ -177,8 +147,7 @@ namespace Automata.Core.FiniteState
             
             return new DeterministicAutomata(_alphabet, ttable);
         }
-        
-        
+                
         public DeterministicAutomata Difference(DeterministicAutomata automata)
         {
             if(Empty || automata.Empty) 
@@ -202,7 +171,56 @@ namespace Automata.Core.FiniteState
             
             return new DeterministicAutomata(_alphabet, ttable);
         }
-        
+
+        public DeterministicAutomata Concat(DeterministicAutomata automata)
+        {
+            var ttable = new List<int?[]>();
+            for (int i = 0; i < _transitions.Count; i++)
+            {
+                if (_transitions[i][ACCEPTCOL] == ACCEPT)
+                {
+                    ttable.Add(new int?[LENGTH]);
+                    for (int j = 0; j < ACCEPTCOL; j++)
+                        if (ttable[i][j] == null) ttable[i][j] = automata._transitions[0][j];
+                }
+                else ttable.Add(_transitions[i]);
+            }
+
+            for (int i = 0; i < automata._transitions.Count; i++)
+                ttable.Add(automata._transitions[i]);
+
+            return new DeterministicAutomata(_alphabet, ttable);
+        }
+
+        public DeterministicAutomata Closure()
+        {
+            var ttable = new List<int?[]>();
+            for (int i = 0; i < _transitions.Count; i++)
+            {
+                if (_transitions[i][ACCEPTCOL] == ACCEPT)
+                {
+                    ttable.Add(new int?[LENGTH]);
+                    for (int j = 0; j < ACCEPTCOL; j++)
+                        if (ttable[i][j] == null) ttable[i][j] = _transitions[0][j];
+                }
+                else ttable.Add(_transitions[i]);
+            }
+
+            return new DeterministicAutomata(_alphabet, ttable);
+        }
+
+        public DeterministicAutomata Reverse()
+        {
+            return this;//ToNonDeterministic().Reverse().ToDeterministic().Optimize();
+        }
+        #endregion
+
+        #region Utilities methods
+        public IAutomata Clone()
+        {
+            return new DeterministicAutomata(_alphabet, new List<int?[]>(_transitions.ToArray()));
+        }
+
         public bool SubsetOf(DeterministicAutomata automata)
         {
             return !Intersection(automata).Empty;
@@ -212,44 +230,30 @@ namespace Automata.Core.FiniteState
         {
             return SubsetOf(automata) && automata.SubsetOf(this);
         }
-        
-        public DeterministicAutomata Concat(DeterministicAutomata automata)
+
+        public DeterministicAutomata Optimize()
         {
-            var ttable = new List<int?[]>();
-            for(int i = 0; i < _transitions.Count; i++)
-            {
-                if(_transitions[i][ACCEPTCOL] == ACCEPT)
-                {
-                    ttable.Add(new int?[LENGTH]);
-                    for(int j = 0; j < ACCEPTCOL; j++) 
-                        if(ttable[i][j] == null) ttable[i][j] = automata._transitions[0][j];
-                }
-                else ttable.Add(_transitions[i]);
-            }
-            
-            for(int i = 0; i < automata._transitions.Count; i++)
-                ttable.Add(automata._transitions[i]);
-            
-            return new DeterministicAutomata(_alphabet, ttable);
+            //inject optimize algorithm
+            return this;
         }
-        
-        public DeterministicAutomata Closure()
+
+        public NonDeterministicAutomata<IComparable> ToNonDeterministic()
         {
-            var ttable = new List<int?[]>();
-            for(int i = 0; i < _transitions.Count; i++)
+            var ttable = new List<List<int>[]>();
+            for (int i = 0; i < _transitions.Count; i++)
             {
-                if(_transitions[i][ACCEPTCOL] == ACCEPT)
+                ttable.Add(new List<int>[LENGTH]);
+                for (int j = 0; j < LENGTH; j++)
                 {
-                    ttable.Add(new int?[LENGTH]);
-                    for(int j = 0; j < ACCEPTCOL; j++) 
-                        if(ttable[i][j] == null) ttable[i][j] = _transitions[0][j];
+                    //ttable[i][j] = new List<int>() { _transitions[i][j] };
                 }
-                else ttable.Add(_transitions[i]);
             }
-            
-            return new DeterministicAutomata(_alphabet, ttable);
+
+            return null;//new NonDeterministicAutomata(_alphabet, ttable);
         }
-        
+        #endregion
+
+        #region Match methods
         public bool AnyMatch(params string[] values)
         {
             int i = 0, j = 0, curr = 0;
@@ -257,7 +261,7 @@ namespace Automata.Core.FiniteState
             int? temp = null;
             for(i = 0; i < values.Length; i++)
             {   
-                j = _alphabet.IndexOf(values[i]);
+                j = _alphabet.IndexOfValue(values[i]);
                 if(j == -1 || !(temp = _transitions[curr][j]).HasValue)
                 {
                     start = -1;
@@ -281,7 +285,7 @@ namespace Automata.Core.FiniteState
             int? temp = null;
             for(i = 0; i < values.Length; i++)
             {
-                j = _alphabet.IndexOf(values[i]);
+                j = _alphabet.IndexOfValue(values[i]);
                 if(j == -1 || !(temp = _transitions[curr][j]).HasValue)
                 {
                     if(end > -1) matches.Add(new [] { start, end });
@@ -315,7 +319,7 @@ namespace Automata.Core.FiniteState
             int? temp = null;
             for(i = 0; i < values.Length; i++)
             {
-                j = _alphabet.IndexOf(values[i].ToString());
+                j = _alphabet.IndexOfValue(values[i].ToString());
                 if(j == -1) 
                     return false;
                 
@@ -335,7 +339,7 @@ namespace Automata.Core.FiniteState
             int? temp = null;
             for (i = 0; i < values.Length; i++)
             {
-                j = _alphabet.IndexOf(values[i].ToString());
+                j = _alphabet.IndexOfValue(values[i].ToString());
                 if (j == -1)
                     return false;
 
@@ -357,7 +361,7 @@ namespace Automata.Core.FiniteState
             {
                 if(_transitions[curr][ACCEPTCOL] == ACCEPT) return true;
                 
-                j = _alphabet.IndexOf(values[i]);
+                j = _alphabet.IndexOfValue(values[i]);
                 if(j == -1) return false;
                 
                 temp = _transitions[curr][j];
@@ -374,5 +378,6 @@ namespace Automata.Core.FiniteState
             var matches = Matches(values);
             return matches.Count > 0 && matches.Last()[1] == values.Length - 1;
         }
+        #endregion
     }
 }
