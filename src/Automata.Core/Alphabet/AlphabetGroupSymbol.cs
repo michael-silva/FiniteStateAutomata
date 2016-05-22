@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using Automata.Core.Interfaces;
 
 namespace Automata.Core.Alphabet
 {

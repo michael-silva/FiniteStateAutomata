@@ -1,17 +1,23 @@
 {
-    "version": "0.1.0",
-    "command": "dmcs",
-    "args": [
-        "-d:DEBUG",
-        "src/Automata.Console/Program.cs"
-    ],  
-    "showOutput": "silent",
-    "taskSelector": "/t:",
-    "tasks": [
-        {
-            "taskName": "exe",
+	"version": "0.1.0",
+	"command": "dotnet",
+    "isShellCommand": true,
+	"args": [],
+	"showOutput": "always",
+    "options": {
+        "cwd": "${workspaceRoot}/src/Automata.Console"
+    },
+	"tasks": [
+		{
+			"taskName": "build",
             "isBuildCommand": true,
-            "problemMatcher": "$msCompile"
-        }
-    ]
+			"showOutput": "always",
+			"problemMatcher": "$msCompile"
+		},
+        {
+			"taskName": "run",
+			"showOutput": "always",
+			"problemMatcher": "$msCompile"
+		}
+	]
 }

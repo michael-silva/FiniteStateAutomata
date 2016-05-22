@@ -1,38 +1,26 @@
 {
-  "version": "1.0.0-*",
-  "description": "Automata Console Application",
-  "authors": [ "" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
+    "version": "1.0.0-*",
+    "name": "Automata.Console",
+    "description": "Automata Console Application",
   
-  "compilationOptions": {
-        "emitEntryPoint": true,
-        "debugType": "portable"
+    "buildOptions": {
+        "emitEntryPoint": true
     },
   
-  "tooling": {
-    "defaultNamespace": "Automata.Console"
-  },
-
-  "dependencies": {
-      "Automata.Core": "1.0.0-*"
-  },
-
-  "commands": {
-    "Automata.Console": "Automata.Console"
-  },
-
-  "frameworks": {
-    "dnx451": { },
-    "dnxcore50": {
-      "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-*",
-        "System.Collections": "4.0.11-beta-*",
-        "System.Console": "4.0.0-beta-*",
-        "System.Linq": "4.0.1-beta-*",
-        "System.Threading": "4.0.11-beta-*"
-      }
+    "dependencies":{
+        "Microsoft.NETCore.App": {
+            "type": "platform",
+            "version": "1.0.0-r2-*"
+        },
+        "Automata.Core":{
+            "type": "build",
+            "version":"1.0.0",
+            "target":"project"
+        }
+    },
+    "frameworks": {
+        "netcoreapp1.0": {
+            "imports": "dnxcore50"
+        }
     }
-  }
 }

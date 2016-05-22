@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using Automata.Core.FiniteState;
-using Automata.Core.Alphabet;
-using Automata.Core.Facade;
 using System;
 
 namespace Automata.Console
@@ -10,6 +6,7 @@ namespace Automata.Console
     {
         public static void Main(string[] args)
         {
+            System.Console.WriteLine("Test");
             try
             {
                 /*
@@ -130,7 +127,6 @@ namespace Automata.Console
             catch (Exception ex)
             {
                 System.Console.WriteLine(ex.Message);
-                System.Console.Read();
             }
             System.Console.WriteLine("Finished!");
             System.Console.Read();

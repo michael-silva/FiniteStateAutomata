@@ -1,24 +1,21 @@
 {
-  "version": "1.0.0-*",
-  "description": "Automata Class Library",
-  "authors": [ "Class Library template" ],
-  "tags": [""],
-  "projectUrl": "",
-  "licenseUrl": "",
-  "tooling": {
-    "defaultNamespace": "Automata.Core"
-  },
-
-  "frameworks": {
-    "net451": { },
-    "dotnet5.4": {
-      "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-*",
-        "System.Collections": "4.0.11-beta-*",
-        "System.Console": "4.0.0-beta-*",
-        "System.Linq": "4.0.1-beta-*",
-        "System.Threading": "4.0.11-beta-*"
-      }
+    "version": "1.0.0-*",
+    "name": "Automata.Core",
+    "description": "Automata Core class library",
+  
+    "dependencies":{
+        "NETStandard.Library": {
+            "version": "1.5.0-rc2-*"   
+        }
+    },
+    
+    "frameworks": {
+        "netstandard1.5": {
+            "imports": "dnxcore50"
+        }
+    },
+    
+    "runtimes": {
+        "ubuntu.16.04-x64": {}
     }
-  }
 }
