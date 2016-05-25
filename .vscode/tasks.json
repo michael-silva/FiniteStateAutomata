@@ -5,7 +5,7 @@
 	"args": [],
 	"showOutput": "always",
     "options": {
-        "cwd": "${workspaceRoot}/src/Automata.Console"
+        "cwd": "${workspaceRoot}/src/Automata.Console/"
     },
 	"tasks": [
 		{
@@ -16,6 +16,15 @@
 		},
         {
 			"taskName": "run",
+			"showOutput": "always",
+			"problemMatcher": "$msCompile"
+		},
+        {
+			"taskName": "test",
+            "args": [
+                "../../test/Automata.Test/"
+            ],
+            "isTestCommand": true,
 			"showOutput": "always",
 			"problemMatcher": "$msCompile"
 		}

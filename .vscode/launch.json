@@ -8,7 +8,7 @@
 			"preLaunchTask": "build",
 			"program": "${workspaceRoot}/src/Automata.Console/bin/Debug/netcoreapp1.0/Automata.Console.dll",
 			"args": [],
-			"cwd": "${workspaceRoot}/src/Automata.Console",
+			"cwd": "${workspaceRoot}/src/Automata.Console/",
 			"stopAtEntry": false
 		}
 	]

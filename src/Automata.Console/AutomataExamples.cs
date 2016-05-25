@@ -26,7 +26,7 @@ namespace Automata.Console
 		
 		public static DeterministicAutomata GetAutomata2()
 		{
-            //Instanciação do automata com string que define um alphabeto de chars
+            //Instanciação do automata com string que define um alfabeto de chars
             var sheeptalk = new DeterministicAutomata("ba!");
             
             //Adicionando transições
@@ -65,6 +65,7 @@ namespace Automata.Console
 
         public static DeterministicAutomata GetAutomata4()
         {
+            //Criação de alfabeto de caracteres agrupados
             var alphabet = new AutomataGroupAlphabet()
                                 .Add("single", new [] { "one" })
                                 .Add("plural1", new [] { "two", "three", "four", "five", "six", "seven", "eight", "nine" })
@@ -75,8 +76,10 @@ namespace Automata.Console
                                 .Add("dollar")
                                 .Add("dollars");
 
+            //Factory para criação de automatas através de interface fluente
             var factory = new AutomataFactory(alphabet);
 
+            //Definição de modelo de automata com estados e suas transições através de um Fluent Facade
             var model = factory.Deterministic()
                             .When("single").To("q2a")
                             .When("plural1").To("q2")
@@ -105,6 +108,7 @@ namespace Automata.Console
                             .When("cents").To("q7")
                         .On("q7").Accept();
 
+            //Getting a automata from model
             return model.CreateAutomata();
         }
     }

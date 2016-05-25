@@ -6,11 +6,9 @@ namespace Automata.Console
     {
         public static void Main(string[] args)
         {
-            System.Console.WriteLine("Test");
             try
             {
                 /*
-                Refatorrar e agrupar métodos
                 Separar exemplos de teste, onte exemplo tem um accept e um reject e teste tem muuuitos accept e muiiitos reject
                 Exemplo de alphabet com FSA de conjugação do verbo
                 Um Exemplo de cada operação
@@ -129,7 +127,6 @@ namespace Automata.Console
                 System.Console.WriteLine(ex.Message);
             }
             System.Console.WriteLine("Finished!");
-            System.Console.Read();
         }
     }
 }
