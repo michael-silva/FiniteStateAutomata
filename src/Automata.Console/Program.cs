@@ -61,10 +61,10 @@ namespace Automata.Console
                 var moneycheck = AutomataExamples.GetAutomata4();
 
                 //Testando o automata
-                var a1 = moneycheck.IsMatch("sixty two dollars", ' ');
-                var a2 = moneycheck.IsMatch("one cent", ' ');
-                var r1 = moneycheck.IsMatch("sixty ten dollars", ' ');
-                var r2 = moneycheck.IsMatch("one cents", ' ');
+                var a1 = moneycheck.SplitMatch("sixty two dollars", ' ');
+                var a2 = moneycheck.SplitMatch("one cent", ' ');
+                var r1 = moneycheck.SplitMatch("sixty ten dollars", ' ');
+                var r2 = moneycheck.SplitMatch("one cents", ' ');
 
                 //Exibir resultado 
                 System.Console.WriteLine($"Exemplo 4");

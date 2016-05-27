@@ -29,10 +29,15 @@ namespace Automata.Core.Alphabet
 
         public int IndexOf(IComparable key)
         {
+            System.Console.WriteLine($"{Length}");
             if(key != null)
             {
                 for(int i = 0; i < Length; i++)
+                {
+                    System.Console.Write($"symb.: {_symbols[i]}");
                     if(_symbols[i].Equals(key)) return i;
+                    System.Console.WriteLine($", {key}");
+                }
             }
             
             return -1;

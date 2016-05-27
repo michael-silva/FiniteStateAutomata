@@ -17,7 +17,8 @@ namespace Automata.Console
             //Definição da tabela de transições
             sheeptalk.State(1, null, null)
                     .State(null, 2, null)
-                    .State(null, 2, 3)
+                    .State(null, 3, null)
+                    .State(null, 3, 4)
                     .State(null, null, null)
                     .AcceptLast();
 			
@@ -26,17 +27,21 @@ namespace Automata.Console
 		
 		public static DeterministicAutomata GetAutomata2()
 		{
-            //Instanciação do automata com string que define um alfabeto de chars
-            var sheeptalk = new DeterministicAutomata("ba!");
+            //Criação de alfabeto de caracteres 
+            var sheepabcd = new AutomataCharAlphabet("ba!");
+            
+            //Instanciação do automata com um alfabeto
+            var sheeptalk = new DeterministicAutomata(sheepabcd);
             
             //Adicionando transições
             sheeptalk.AddTransition('b', 0, 1); 
-            sheeptalk.AddTransition('a', 1, 2);
-            sheeptalk.AddTransition('a', 2, 2);
-            sheeptalk.AddTransition('!', 2, 3);
+            sheeptalk.AddTransition('a', 1, 2); 
+            sheeptalk.AddTransition('a', 2, 3);
+            sheeptalk.AddTransition('a', 3, 3);
+            sheeptalk.AddTransition('!', 3, 4);
             
             //Define o 4º estado como aceito
-            sheeptalk.AcceptState(3);
+            sheeptalk.AcceptState(4);
 			
 			return sheeptalk;
 		}
@@ -44,14 +49,16 @@ namespace Automata.Console
 		public static DeterministicAutomata GetAutomata3()
         {   
             //Criação de alfabeto de caracteres 
-            var sheepabcd = new AutomataCharAlphabet("ba!");
+            var sheepabcd = new AutomataCharAlphabet();
             
-            //Factory para criação de automatas através de interface fluente 
-            var sheepfactory = new AutomataFactory(sheepabcd);
+            //Factory para criação de automatas através de interface fluente e string que define um alfabeto de chars
+            var sheepfactory = new AutomataFactory("ba!");
             
             //Definição de modelo de automata com estados e suas transições através de um Fluent Facade 
             var sheepmodel = sheepfactory.Deterministic()
                                 .When('b').ToNext()
+                                .OnNext()
+                                .When('a').ToNext()
                                 .OnNext()
                                 .When('a').ToNext()
                                 .OnNext()
@@ -60,10 +67,34 @@ namespace Automata.Console
                                 .OnNext().Accept();
                                 
             //Getting a automata from model
-            return sheepmodel.CreateAutomata();
+            return sheepmodel.CreateAutomata() as DeterministicAutomata;
+        }
+        
+		public static DeterministicAutomata GetAutomata4()
+        {   
+            //Criação de alfabeto de caracteres 
+            var sheepabcd = new AutomataCharAlphabet();
+            
+            //Factory para criação de automatas através de interface fluente e string que define um alfabeto de chars
+            var sheepfactory = new AutomataFactory("beh");
+            
+            //Definição de modelo de automata com estados e suas transições através de um Fluent Facade 
+            var sheepmodel = sheepfactory.Deterministic()
+                                .When('b').ToNext()
+                                .OnNext()
+                                .When('e').ToNext()
+                                .OnNext()
+                                .When('e').ToNext()
+                                .OnNext()
+                                .When('e').Repeat()
+                                .When('h').ToNext()
+                                .OnNext().Accept();
+                                
+            //Getting a automata from model
+            return sheepmodel.CreateAutomata() as DeterministicAutomata;
         }
 
-        public static DeterministicAutomata GetAutomata4()
+        public static DeterministicAutomata GetAutomata5()
         {
             //Criação de alfabeto de caracteres agrupados
             var alphabet = new AutomataGroupAlphabet()

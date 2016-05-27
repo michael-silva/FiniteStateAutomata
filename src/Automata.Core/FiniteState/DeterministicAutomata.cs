@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Automata.Core.Interfaces;
-using Automata.Core.Alphabet;
 
 namespace Automata.Core.FiniteState
 {
@@ -25,7 +24,7 @@ namespace Automata.Core.FiniteState
         #endregion
 
         #region Constructors
-        public DeterministicAutomata(IAutomataAlphabet alphabet, List<int?[]> transitions)
+        private DeterministicAutomata(IAutomataAlphabet alphabet, List<int?[]> transitions)
         {
             ACCEPTCOL = alphabet.Length;
             LENGTH = alphabet.Length + 1;
@@ -39,10 +38,6 @@ namespace Automata.Core.FiniteState
         
         public DeterministicAutomata(IAutomataAlphabet alphabet)
             : this(alphabet, null)
-        { }
-        
-        public DeterministicAutomata(string symbols)
-            : this(new AutomataCharAlphabet(symbols), null)
         { }
         #endregion
 
@@ -202,6 +197,7 @@ namespace Automata.Core.FiniteState
                     ttable.Add(new int?[LENGTH]);
                     for (int j = 0; j < ACCEPTCOL; j++)
                         if (ttable[i][j] == null) ttable[i][j] = _transitions[0][j];
+                    ttable[i][ACCEPTCOL] = ACCEPT;
                 }
                 else ttable.Add(_transitions[i]);
             }
@@ -256,12 +252,23 @@ namespace Automata.Core.FiniteState
         #region Match methods
         public bool AnyMatch(params string[] values)
         {
+            return AnyMatch<string>(values);
+        }
+        
+        public bool AnyMatch(params char[] values)
+        {
+            return AnyMatch<char>(values);
+        }
+        
+        private bool AnyMatch<T>(ICollection<T> values)
+            where T : IComparable
+        {
             int i = 0, j = 0, curr = 0;
             int start = -1;
             int? temp = null;
-            for(i = 0; i < values.Length; i++)
+            for(i = 0; i < values.Count; i++)
             {   
-                j = _alphabet.IndexOfValue(values[i]);
+                j = _alphabet.IndexOfValue(values.ElementAt(i));
                 if(j == -1 || !(temp = _transitions[curr][j]).HasValue)
                 {
                     start = -1;
@@ -279,13 +286,24 @@ namespace Automata.Core.FiniteState
         
         public List<int[]> Matches(params string[] values)
         {
+            return Matches<string>(values);
+        }
+        
+        public List<int[]> Matches(params char[] values)
+        {
+            return Matches<char>(values);
+        }
+        
+        private List<int[]> Matches<T>(ICollection<T> values)
+            where T : IComparable
+        {
             var matches = new List<int[]>();
             int i = 0, j = 0, curr = 0;
             int start = -1, end = -1;
             int? temp = null;
-            for(i = 0; i < values.Length; i++)
+            for(i = 0; i < values.Count; i++)
             {
-                j = _alphabet.IndexOfValue(values[i]);
+                j = _alphabet.IndexOfValue(values.ElementAt(i));
                 if(j == -1 || !(temp = _transitions[curr][j]).HasValue)
                 {
                     if(end > -1) matches.Add(new [] { start, end });
@@ -302,44 +320,30 @@ namespace Automata.Core.FiniteState
             if(end > -1) matches.Add(new [] { start, end });
             return matches;
         }
-
-        public bool IsMatch(string value, char separator)
+        
+        public bool SplitMatch(string value, char separator)
         {
             return IsMatch(value.Split(separator));
         }
-
-        public bool IsMatch(string value)
+        
+        public bool IsMatch(params string[] values)
         {
-            return IsMatch(value.ToCharArray());
+            return IsMatch<string>(values);
+        }
+        
+        public bool IsMatch(params char[] values)
+        {
+            return IsMatch<char>(values);
         }
 
-        public bool IsMatch(char[] values)
+        private bool IsMatch<T>(ICollection<T> values)
+            where T : IComparable
         {
             int i = 0, j = 0, curr = 0;
             int? temp = null;
-            for(i = 0; i < values.Length; i++)
+            for (i = 0; i < values.Count; i++)
             {
-                j = _alphabet.IndexOfValue(values[i].ToString());
-                if(j == -1) 
-                    return false;
-                
-                temp = _transitions[curr][j];
-                if(!temp.HasValue)
-                    return false;
-                
-                curr = temp.Value;
-            }
-            
-            return _transitions[curr][ACCEPTCOL] == ACCEPT;
-        }
-
-        public bool IsMatch(string[] values)
-        {
-            int i = 0, j = 0, curr = 0;
-            int? temp = null;
-            for (i = 0; i < values.Length; i++)
-            {
-                j = _alphabet.IndexOfValue(values[i].ToString());
+                j = _alphabet.IndexOfValue(values.ElementAt(i));
                 if (j == -1)
                     return false;
 
@@ -355,13 +359,24 @@ namespace Automata.Core.FiniteState
 
         public bool BeginMatch(params string[] values)
         {
+            return BeginMatch<string>(values);
+        }
+        
+        public bool BeginMatch(params char[] values)
+        {
+            return BeginMatch<char>(values);
+        }
+        
+        private bool BeginMatch<T>(ICollection<T> values)
+            where T : IComparable
+        {
             int i = 0, j = 0, curr = 0;
             int? temp = null;
-            for(i = 0; i < values.Length; i++)
+            for(i = 0; i < values.Count; i++)
             {
                 if(_transitions[curr][ACCEPTCOL] == ACCEPT) return true;
                 
-                j = _alphabet.IndexOfValue(values[i]);
+                j = _alphabet.IndexOfValue(values.ElementAt(i));
                 if(j == -1) return false;
                 
                 temp = _transitions[curr][j];
@@ -375,8 +390,19 @@ namespace Automata.Core.FiniteState
         
         public bool EndMatch(params string[] values)
         {
+            return EndMatch<string>(values);
+        }
+        
+        public bool EndMatch(params char[] values)
+        {
+            return EndMatch<char>(values);
+        }
+        
+        public bool EndMatch<T>(ICollection<T> values)
+            where T : IComparable
+        {
             var matches = Matches(values);
-            return matches.Count > 0 && matches.Last()[1] == values.Length - 1;
+            return matches.Count > 0 && matches.Last()[1] == values.Count - 1;
         }
         #endregion
     }

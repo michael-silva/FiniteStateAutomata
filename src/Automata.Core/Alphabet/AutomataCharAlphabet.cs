@@ -33,8 +33,9 @@ namespace Automata.Core.Alphabet
         {
             if (key != null)
             {
+                char keyChar = Convert.ToChar(key);
                 for (int i = 0; i < Length; i++)
-                    if (_symbols[i].Equals(key)) return i;
+                    if(_symbols[i].Equals(keyChar)) return i;
             }
 
             return -1;
