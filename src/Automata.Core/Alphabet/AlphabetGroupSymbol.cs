@@ -4,8 +4,8 @@ namespace Automata.Core.Alphabet
 {
     public class AlphabetGroupSymbol
     {
-        private IComparable[] _values;
-        public IComparable Key { get; private set; }
+        private object[] _values;
+        public string Key { get; private set; }
 
         private AlphabetGroupSymbol(string key, int length)
         {
@@ -13,7 +13,7 @@ namespace Automata.Core.Alphabet
             _values = new IComparable[length];
         }
 
-        public AlphabetGroupSymbol(string key, params IComparable[] values)
+        public AlphabetGroupSymbol(string key, params object[] values)
         {
             Key = key;
             _values = values;
@@ -32,15 +32,8 @@ namespace Automata.Core.Alphabet
             for (int i = 0; i < _values.Length; i++)
                 _values[i] = values[i];
         }
-
-        /*public AlphabetGroupSymbol(string key, params IAutomata[] values)
-        {
-            Key = key;
-            for (int i = 0; i < _values.Length; i++)
-                _values[i] = values[i];
-        }*/
                 
-        public bool HasValue(IComparable value)
+        public bool HasValue(object value)
         {
             for(int i = 0; i < _values.Length; i++)
                 if(_values[i].Equals(value)) return true;

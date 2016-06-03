@@ -85,8 +85,8 @@ namespace Automata.Test
             var matches = new [] {
                 "baa!",
                 "baaaaaaaaaaaaaaaaaa!",
-                "beeh",
-                "beeeeeeeeeeeeeeeeeeh"
+                "!aab",
+                "!aaaaaaaaaaaaaaaaaab"
             };
             
             var unmatches = new [] {
@@ -94,10 +94,11 @@ namespace Automata.Test
                 "bbaa!",
                 "aaa!",
                 "baaa",
-                "baa!a",
-                "abaa!",
-                "baa!baa!baa!baa",
-                "baa!bbaa!"
+                "!ab",
+                "!!aab",
+                "aaab",
+                "!aaa",
+                "baa!aab"
             };
             
             for(int i = 0; i < sheeptalks.Length; i++)
@@ -105,8 +106,8 @@ namespace Automata.Test
                 for(int j = 0; j < matches.Length; j++)
                     Assert.True(sheeptalks[i].IsMatch(matches[j].ToCharArray()), matches[j]);
                     
-                //for(int j = 0; j < unmatches.Length; j++)
-                //    Assert.False(sheeptalks[i].IsMatch(unmatches[j].ToCharArray()), unmatches[j]);
+                for(int j = 0; j < unmatches.Length; j++)
+                    Assert.False(sheeptalks[i].IsMatch(unmatches[j].ToCharArray()), unmatches[j]);
             }
         }
         

@@ -6,8 +6,10 @@ namespace Automata.Core.Interfaces
     {
         int Length { get; }
         
-        int IndexOf(IComparable key);
+        bool Equals(IAutomataAlphabet key);
+        
+        int IndexOf(object key);
 
-        int IndexOfValue(IComparable value);
+        int IndexOfValue(object value);
     }
 }

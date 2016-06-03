@@ -76,18 +76,18 @@ namespace Automata.Console
             var sheepabcd = new AutomataCharAlphabet();
             
             //Factory para criação de automatas através de interface fluente e string que define um alfabeto de chars
-            var sheepfactory = new AutomataFactory("beh");
+            var sheepfactory = new AutomataFactory("ba!");
             
             //Definição de modelo de automata com estados e suas transições através de um Fluent Facade 
             var sheepmodel = sheepfactory.Deterministic()
+                                .When('!').ToNext()
+                                .OnNext()
+                                .When('a').ToNext()
+                                .OnNext()
+                                .When('a').ToNext()
+                                .OnNext()
+                                .When('a').Repeat()
                                 .When('b').ToNext()
-                                .OnNext()
-                                .When('e').ToNext()
-                                .OnNext()
-                                .When('e').ToNext()
-                                .OnNext()
-                                .When('e').Repeat()
-                                .When('h').ToNext()
                                 .OnNext().Accept();
                                 
             //Getting a automata from model

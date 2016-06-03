@@ -19,7 +19,7 @@ namespace Automata.Core.FiniteState
         
         public IAutomataAlphabet Alphabet { get { return _alphabet; } }
         public bool Acceptance { get { return _acceptCount > 0; } }
-        public bool Empty { get { return _alphabet.Length > 0; } }
+        public bool Empty { get { return _alphabet.Length == 0; } }
         public bool Totality { get { return _acceptCount == _transitions.Count; } }
         #endregion
 
@@ -34,6 +34,9 @@ namespace Automata.Core.FiniteState
             
             if(transitions != null)
                 _transitions = transitions;
+                
+            for(int i = 0; i < _transitions.Count; i++)
+                if(_transitions[i][ACCEPTCOL] == ACCEPT) _acceptCount++;
         }
         
         public DeterministicAutomata(IAutomataAlphabet alphabet)
@@ -94,9 +97,16 @@ namespace Automata.Core.FiniteState
         }
         #endregion
 
-        #region Operations methods        
+        #region Operations methods
+        private bool SameAlphabet(DeterministicAutomata automata)
+        {
+            return automata.Alphabet.Equals(_alphabet);
+        }
+                
         public DeterministicAutomata Intersection(DeterministicAutomata automata)
         {
+            if(!SameAlphabet(automata))
+                throw new Exception("The Intersection method need a automata with the same alphabet");
             if(Empty || automata.Empty) 
                 return this;
                 
@@ -121,30 +131,47 @@ namespace Automata.Core.FiniteState
         
         public DeterministicAutomata Union(DeterministicAutomata automata)
         {
+            if(!SameAlphabet(automata))
+                throw new Exception("The Union method need a automata with the same alphabet");
+            
             if(Empty || automata.Empty) 
                 return this;
-                
+            
             var ttable = new List<int?[]>();
-            for(int i = 0; i < _transitions.Count; i++)
+            for(int i = 0; i <= _transitions.Count; i++)
             {
-                for(int j = 0; j < automata._transitions.Count; j++)
-                {    
+                for(int j = 0; j <= automata._transitions.Count; j++)
+                {
                     ttable.Add(new int?[LENGTH]);
                     for(int z = 0; z < _alphabet.Length; z++)
                     {
-                        ttable[i + j][z] = _transitions[i][z] + automata._transitions[j][z];
+                        if((i == _transitions.Count || _transitions[i][z].HasValue) 
+                            || (j == automata._transitions.Count || automata._transitions[j][z].HasValue))
+                        {
+                            int to = (i < _transitions.Count && _transitions[i][z].HasValue ? i : _transitions.Count) * (automata._transitions.Count + 1);
+                            to += (j < automata._transitions.Count && automata._transitions[j][z].HasValue ? j : automata._transitions.Count);
+                            System.Console.WriteLine($"{i}-{j}-{z} {(i * (automata._transitions.Count + 1)) + j} to {to}");
+                            ttable[(i * (automata._transitions.Count + 1)) + j][z] = to;
+                        }
                     }
                 
-                    if(_transitions[i][ACCEPTCOL] == ACCEPT || automata._transitions[j][ACCEPTCOL] == ACCEPT)
-                        ttable[i + j][ACCEPTCOL] = ACCEPT;
+                    if((i < _transitions.Count && _transitions[i][ACCEPTCOL] == ACCEPT) 
+                        || (j < automata._transitions.Count && automata._transitions[j][ACCEPTCOL] == ACCEPT))
+                        ttable[(i * (automata._transitions.Count + 1)) + j][ACCEPTCOL] = ACCEPT;
+                        
+                    for(int z = 0; z < LENGTH; z++)
+                        System.Console.Write($"{ttable[(i * (automata._transitions.Count + 1)) + j][z] ?? 0}, ");
+                    System.Console.WriteLine();
                 }
             }
             
             return new DeterministicAutomata(_alphabet, ttable);
         }
-                
+           
         public DeterministicAutomata Difference(DeterministicAutomata automata)
         {
+            if(!SameAlphabet(automata))
+                throw new Exception("The Intersection method need a automata with the same alphabet");
             if(Empty || automata.Empty) 
                 return this;
                 
@@ -169,6 +196,9 @@ namespace Automata.Core.FiniteState
 
         public DeterministicAutomata Concat(DeterministicAutomata automata)
         {
+            if(!SameAlphabet(automata))
+                throw new Exception("The Intersection method need a automata with the same alphabet");
+                
             var ttable = new List<int?[]>();
             for (int i = 0; i < _transitions.Count; i++)
             {
@@ -222,9 +252,11 @@ namespace Automata.Core.FiniteState
             return !Intersection(automata).Empty;
         }
         
-        public bool Equals(DeterministicAutomata automata)
+        public bool Equals(IAutomata other)
         {
-            return SubsetOf(automata) && automata.SubsetOf(this);
+            return other is DeterministicAutomata 
+                    && SubsetOf(other as DeterministicAutomata) 
+                    && (other as DeterministicAutomata).SubsetOf(this);
         }
 
         public DeterministicAutomata Optimize()

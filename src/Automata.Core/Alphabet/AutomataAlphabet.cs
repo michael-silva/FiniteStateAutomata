@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Automata.Core.Interfaces;
 
@@ -6,13 +5,13 @@ namespace Automata.Core.Alphabet
 {
     public class AutomataAlphabet : IAutomataAlphabet
     {
-        private List<IComparable> _symbols;
+        private List<object> _symbols;
         
-        public int Length { get { return _symbols.Count; } } 
-        
+        public int Length { get { return _symbols.Count; } }
+
         public AutomataAlphabet()
         { 
-            _symbols = new List<IComparable>();
+            _symbols = new List<object>();
         }
         
         public AutomataAlphabet(params string[] symbols)
@@ -22,22 +21,17 @@ namespace Automata.Core.Alphabet
                 _symbols.Add(symbols[i]);
         }
 
-        public int IndexOfValue(IComparable value)
+        public int IndexOfValue(object value)
         {
             return IndexOf(value);
         }
 
-        public int IndexOf(IComparable key)
+        public int IndexOf(object key)
         {
-            System.Console.WriteLine($"{Length}");
-            if(key != null)
+            if(key != null && key is string)
             {
                 for(int i = 0; i < Length; i++)
-                {
-                    System.Console.Write($"symb.: {_symbols[i]}");
                     if(_symbols[i].Equals(key)) return i;
-                    System.Console.WriteLine($", {key}");
-                }
             }
             
             return -1;
@@ -45,16 +39,23 @@ namespace Automata.Core.Alphabet
         
         public AutomataAlphabet Add(string symbol)
         {
-            return Add(symbol);
-        }
-        
-        private AutomataAlphabet Add(IComparable symbol)
-        {
             if(symbol == null) 
                 throw new System.ArgumentNullException("It's not possible add null symbol to alphabet");
             
             _symbols.Add(symbol);
             return this;
+        }
+        
+        public bool Equals(IAutomataAlphabet other)
+        {
+            if(!(other is AutomataAlphabet) || other.Length != Length) return false;
+            
+            var automata = other as AutomataAlphabet;
+            for(int i = 0; i < Length; i++)
+                if(!_symbols[i].Equals(automata._symbols[i]))
+                    return false;
+                
+            return true; 
         }
     }
 }

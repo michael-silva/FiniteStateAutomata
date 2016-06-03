@@ -24,14 +24,14 @@ namespace Automata.Core.Alphabet
             : this(symbols.ToCharArray())
         { }
 
-        public int IndexOfValue(IComparable value)
+        public int IndexOfValue(object value)
         {
             return IndexOf(value);
         }
 
-        public int IndexOf(IComparable key)
+        public int IndexOf(object key)
         {
-            if (key != null)
+            if (key != null && key is char)
             {
                 char keyChar = Convert.ToChar(key);
                 for (int i = 0; i < Length; i++)
@@ -52,6 +52,18 @@ namespace Automata.Core.Alphabet
             for(int i = 0; i < symbols.Length; i++)
                 _symbols.Add(symbols[i]);
             return this;
+        }
+        
+        public bool Equals(IAutomataAlphabet other)
+        {
+            if(!(other is AutomataCharAlphabet) || other.Length != Length) return false;
+            
+            var automata = other as AutomataCharAlphabet;
+            for(int i = 0; i < Length; i++)
+                if(!_symbols[i].Equals(automata._symbols[i]))
+                    return false;
+                
+            return true;
         }
     }
 }
