@@ -71,7 +71,13 @@ namespace Automata.Core.Facade
         public AutomataModel<T> To(string name)
         {
             int to = IndexOfState(name);
-            _automata.AddTransition(_currSymbol, _currState, to);
+            
+            return To(to);
+        }
+        
+        public AutomataModel<T> To(int index)
+        {
+            _automata.AddTransition(_currSymbol, _currState, index);
             return this;
         }
         

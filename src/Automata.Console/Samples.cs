@@ -3,10 +3,10 @@ using Automata.Core.Alphabet;
 using Automata.Core.Facade;
 
 namespace Automata.Console
-{
-    public static class AutomataExamples
+{   
+    public static class Samples
     {
-        public static DeterministicAutomata GetAutomata1()
+        public static DeterministicAutomata Sheeptalk1()
 		{
             //Criação de alfabeto de caracteres 
             var sheepabcd = new AutomataCharAlphabet("ba!");
@@ -25,7 +25,7 @@ namespace Automata.Console
 			return sheeptalk;
 		}
 		
-		public static DeterministicAutomata GetAutomata2()
+		public static DeterministicAutomata Sheeptalk2()
 		{
             //Criação de alfabeto de caracteres 
             var sheepabcd = new AutomataCharAlphabet("ba!");
@@ -46,7 +46,7 @@ namespace Automata.Console
 			return sheeptalk;
 		}
 		
-		public static DeterministicAutomata GetAutomata3()
+		public static DeterministicAutomata Sheeptalk3()
         {   
             //Criação de alfabeto de caracteres 
             var sheepabcd = new AutomataCharAlphabet();
@@ -70,7 +70,7 @@ namespace Automata.Console
             return sheepmodel.CreateAutomata() as DeterministicAutomata;
         }
         
-		public static DeterministicAutomata GetAutomata4()
+		public static DeterministicAutomata StuttererSeeptalk()
         {   
             //Criação de alfabeto de caracteres 
             var sheepabcd = new AutomataCharAlphabet();
@@ -79,22 +79,26 @@ namespace Automata.Console
             var sheepfactory = new AutomataFactory("ba!");
             
             //Definição de modelo de automata com estados e suas transições através de um Fluent Facade 
-            var sheepmodel = sheepfactory.Deterministic()
-                                .When('!').ToNext()
+            var stuttererSheepModel = sheepfactory.Deterministic()
+                                .When('b').ToNext()
                                 .OnNext()
                                 .When('a').ToNext()
                                 .OnNext()
                                 .When('a').ToNext()
+                                .OnNext()
+                                .When('b').To(1)
+                                .When('a').ToNext()
+                                .When('!').To(5)
                                 .OnNext()
                                 .When('a').Repeat()
-                                .When('b').ToNext()
+                                .When('b').To(1)
                                 .OnNext().Accept();
                                 
             //Getting a automata from model
-            return sheepmodel.CreateAutomata() as DeterministicAutomata;
+            return stuttererSheepModel.CreateAutomata() as DeterministicAutomata;
         }
 
-        public static DeterministicAutomata GetAutomata5()
+        public static DeterministicAutomata Money()
         {
             //Criação de alfabeto de caracteres agrupados
             var alphabet = new AutomataGroupAlphabet()
@@ -117,6 +121,8 @@ namespace Automata.Console
                             .When("plural2").To("q2")
                             .When("tens").To("q1")
                         .On("q1").Accept()
+                            .When("cents").To("q7")
+                            .When("dollars").To("q4")
                             .When("single").To("q2")
                             .When("plural1").To("q2")
                         .On("q2a")
@@ -131,6 +137,7 @@ namespace Automata.Console
                             .When("plural2").To("q6")
                             .When("tens").To("q5")
                         .On("q5").Accept()
+                            .When("cents").To("q7")
                             .When("single").To("q6")
                             .When("plural1").To("q6")
                         .On("q6a")

@@ -9,7 +9,6 @@ namespace Automata.Console
             try
             {
                 /*
-                Separar exemplos de teste, onte exemplo tem um accept e um reject e teste tem muuuitos accept e muiiitos reject
                 Exemplo de alphabet com FSA de conjugação do verbo
                 Um Exemplo de cada operação
                 Todos os exemplos em NonDeterminitic
@@ -19,7 +18,7 @@ namespace Automata.Console
 
                 /** Exemplo 1 **/
                 //Método de exemplo para criação de automata
-                var sheeptalk1 = AutomataExamples.GetAutomata1();
+                var sheeptalk1 = Samples.Sheeptalk1();
 
                 //Testando o automata
                 bool accept1 = sheeptalk1.IsMatch("baaa!"); //Match consecutive string
@@ -32,7 +31,7 @@ namespace Automata.Console
 
                 /** Exemplo 2 **/
                 //Método de exemplo para criação de automata
-                var sheeptalk2 = AutomataExamples.GetAutomata2();
+                var sheeptalk2 = Samples.Sheeptalk2();
 
                 //Testando o automata
                 var accept2 = sheeptalk2.IsMatch("baaa!"); ;
@@ -45,7 +44,7 @@ namespace Automata.Console
 
                 /** Exemplo 3 **/
                 //Método de exemplo para criação de automata
-                var sheeptalk3 = AutomataExamples.GetAutomata3();
+                var sheeptalk3 = Samples.Sheeptalk3();
 
                 //Testando o automata
                 var accept3 = sheeptalk3.IsMatch("baaa!"); ;
@@ -58,7 +57,7 @@ namespace Automata.Console
 
                 /** Exemplo 4 **/
                 //Método de exemplo para criação de automata
-                var moneycheck = AutomataExamples.GetAutomata4();
+                var moneycheck = Samples.Money();
 
                 //Testando o automata
                 var a1 = moneycheck.SplitMatch("sixty two dollars", ' ');

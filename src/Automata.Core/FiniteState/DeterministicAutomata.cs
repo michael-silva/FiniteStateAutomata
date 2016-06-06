@@ -107,22 +107,38 @@ namespace Automata.Core.FiniteState
         {
             if(!SameAlphabet(automata))
                 throw new Exception("The Intersection method need a automata with the same alphabet");
+                
             if(Empty || automata.Empty) 
                 return this;
                 
             var ttable = new List<int?[]>();
-            for(int i = 0; i < _transitions.Count; i++)
+            for(int i = 0; i <= _transitions.Count; i++)
             {
-                for(int j = 0; j < automata._transitions.Count; j++)
+                for(int j = 0; j <= automata._transitions.Count; j++)
                 {    
                     ttable.Add(new int?[LENGTH]);
                     for(int z = 0; z < _alphabet.Length; z++)
                     {
-                        ttable[i + j][z] = _transitions[i][z] + automata._transitions[j][z];
+                        if((i == _transitions.Count || _transitions[i][z].HasValue) 
+                            || (j == automata._transitions.Count || automata._transitions[j][z].HasValue))
+                        {
+                            int to = (i < _transitions.Count && _transitions[i][z].HasValue ? _transitions[i][z].Value : _transitions.Count) * (automata._transitions.Count + 1);
+                            to += (j < automata._transitions.Count && automata._transitions[j][z].HasValue ? automata._transitions[j][z].Value : automata._transitions.Count);
+                            ttable[(i * (automata._transitions.Count + 1)) + j][z] = to;
+                        }
                     }
                 
-                    if(_transitions[i][ACCEPTCOL] == ACCEPT && automata._transitions[j][ACCEPTCOL] == ACCEPT)
-                        ttable[i + j][ACCEPTCOL] = ACCEPT;
+                    if((i < _transitions.Count && _transitions[i][ACCEPTCOL] == ACCEPT) 
+                        && (j < automata._transitions.Count && automata._transitions[j][ACCEPTCOL] == ACCEPT))
+                    {
+                        //System.Console.WriteLine($"{(i * (automata._transitions.Count + 1)) + j}");
+                        ttable[(i * (automata._transitions.Count + 1)) + j][ACCEPTCOL] = ACCEPT;
+                    }
+                    
+                    /*System.Console.Write($"{(i * (automata._transitions.Count + 1)) + j}-");
+                    for(int z = 0; z < LENGTH; z++)
+                        System.Console.Write($"{ttable[(i * (automata._transitions.Count + 1)) + j][z] ?? 0}, ");
+                    System.Console.WriteLine();*/
                 }
             }
             
@@ -148,9 +164,8 @@ namespace Automata.Core.FiniteState
                         if((i == _transitions.Count || _transitions[i][z].HasValue) 
                             || (j == automata._transitions.Count || automata._transitions[j][z].HasValue))
                         {
-                            int to = (i < _transitions.Count && _transitions[i][z].HasValue ? i : _transitions.Count) * (automata._transitions.Count + 1);
-                            to += (j < automata._transitions.Count && automata._transitions[j][z].HasValue ? j : automata._transitions.Count);
-                            System.Console.WriteLine($"{i}-{j}-{z} {(i * (automata._transitions.Count + 1)) + j} to {to}");
+                            int to = (i < _transitions.Count && _transitions[i][z].HasValue ? _transitions[i][z].Value : _transitions.Count) * (automata._transitions.Count + 1);
+                            to += (j < automata._transitions.Count && automata._transitions[j][z].HasValue ? automata._transitions[j][z].Value : automata._transitions.Count);
                             ttable[(i * (automata._transitions.Count + 1)) + j][z] = to;
                         }
                     }
@@ -158,36 +173,10 @@ namespace Automata.Core.FiniteState
                     if((i < _transitions.Count && _transitions[i][ACCEPTCOL] == ACCEPT) 
                         || (j < automata._transitions.Count && automata._transitions[j][ACCEPTCOL] == ACCEPT))
                         ttable[(i * (automata._transitions.Count + 1)) + j][ACCEPTCOL] = ACCEPT;
-                        
-                    for(int z = 0; z < LENGTH; z++)
+                       
+                    /*for(int z = 0; z < LENGTH; z++)
                         System.Console.Write($"{ttable[(i * (automata._transitions.Count + 1)) + j][z] ?? 0}, ");
-                    System.Console.WriteLine();
-                }
-            }
-            
-            return new DeterministicAutomata(_alphabet, ttable);
-        }
-           
-        public DeterministicAutomata Difference(DeterministicAutomata automata)
-        {
-            if(!SameAlphabet(automata))
-                throw new Exception("The Intersection method need a automata with the same alphabet");
-            if(Empty || automata.Empty) 
-                return this;
-                
-            var ttable = new List<int?[]>();
-            for(int i = 0; i < _transitions.Count; i++)
-            {
-                for(int j = 0; j < automata._transitions.Count; j++)
-                {    
-                    ttable.Add(new int?[LENGTH]);
-                    for(int z = 0; z < _alphabet.Length; z++)
-                    {
-                        ttable[i + j][z] = _transitions[i][z] + automata._transitions[j][z];
-                    }
-                
-                    if(_transitions[i][ACCEPTCOL] == ACCEPT && automata._transitions[j][ACCEPTCOL] != ACCEPT)
-                        ttable[i + j][ACCEPTCOL] = ACCEPT;
+                    System.Console.WriteLine();*/
                 }
             }
             
@@ -197,7 +186,7 @@ namespace Automata.Core.FiniteState
         public DeterministicAutomata Concat(DeterministicAutomata automata)
         {
             if(!SameAlphabet(automata))
-                throw new Exception("The Intersection method need a automata with the same alphabet");
+                throw new Exception("The Concat method need a automata with the same alphabet");
                 
             var ttable = new List<int?[]>();
             for (int i = 0; i < _transitions.Count; i++)
@@ -206,14 +195,26 @@ namespace Automata.Core.FiniteState
                 {
                     ttable.Add(new int?[LENGTH]);
                     for (int j = 0; j < ACCEPTCOL; j++)
-                        if (ttable[i][j] == null) ttable[i][j] = automata._transitions[0][j];
+                        if (_transitions[i][j] == null) ttable[i][j] = _transitions.Count + automata._transitions[0][j];
+                        else ttable[i][j] = _transitions[i][j]; 
                 }
                 else ttable.Add(_transitions[i]);
             }
 
             for (int i = 0; i < automata._transitions.Count; i++)
-                ttable.Add(automata._transitions[i]);
-
+            {
+                ttable.Add(new int?[LENGTH]);
+                for (int j = 0; j < LENGTH; j++)
+                    if(automata._transitions[i][j].HasValue)
+                        ttable.Last()[j] = (ACCEPTCOL > j ? _transitions.Count : 0) + automata._transitions[i][j].Value;
+            }
+            
+            /*for(int i = 0; i < ttable.Count; i++)
+            {
+                for (int j = 0; j < ACCEPTCOL; j++)
+                    System.Console.Write($"{ttable[i][j]}, ");
+                System.Console.WriteLine();
+            }*/
             return new DeterministicAutomata(_alphabet, ttable);
         }
 
@@ -226,7 +227,7 @@ namespace Automata.Core.FiniteState
                 {
                     ttable.Add(new int?[LENGTH]);
                     for (int j = 0; j < ACCEPTCOL; j++)
-                        if (ttable[i][j] == null) ttable[i][j] = _transitions[0][j];
+                        if (_transitions[i][j] == null) ttable[i][j] = _transitions[0][j];
                     ttable[i][ACCEPTCOL] = ACCEPT;
                 }
                 else ttable.Add(_transitions[i]);
@@ -310,7 +311,7 @@ namespace Automata.Core.FiniteState
                 
                 curr = temp.Value;
                 if(start == -1) start = i;
-                //else (_transitions[curr][ACCEPTCOL] == ACCEPT) return true;
+                else if (_transitions[curr][ACCEPTCOL] == ACCEPT) return true;
             }
             
             return false;
@@ -338,7 +339,11 @@ namespace Automata.Core.FiniteState
                 j = _alphabet.IndexOfValue(values.ElementAt(i));
                 if(j == -1 || !(temp = _transitions[curr][j]).HasValue)
                 {
-                    if(end > -1) matches.Add(new [] { start, end });
+                    if(end > -1) 
+                    {
+                        i = end;
+                        matches.Add(new [] { start, end });
+                    }
                     start = end = -1;
                     curr = 0;
                     continue;
@@ -367,7 +372,27 @@ namespace Automata.Core.FiniteState
         {
             return IsMatch<char>(values);
         }
+        
+        public bool Match(string input)
+        {
+            int i = 0, j = 0, curr = 0;
+            int? temp = null;
+            /*for (i = 0; i < values.Count; i++)
+            {
+                j = _alphabet.IndexOfValue(values.ElementAt(i));
+                if (j == -1)
+                    return false;
 
+                temp = _transitions[curr][j];
+                if (!temp.HasValue)
+                    return false;
+
+                curr = temp.Value;
+            }*/
+
+            return _transitions[curr][ACCEPTCOL] == ACCEPT;
+        }
+        
         private bool IsMatch<T>(ICollection<T> values)
             where T : IComparable
         {
