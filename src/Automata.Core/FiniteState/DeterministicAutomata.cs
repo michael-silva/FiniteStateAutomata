@@ -375,20 +375,29 @@ namespace Automata.Core.FiniteState
         
         public bool Match(string input)
         {
-            int i = 0, j = 0, curr = 0;
+            int i = 0, j = 0, curr = 0, aux = 0;
             int? temp = null;
-            /*for (i = 0; i < values.Count; i++)
+            while (i < input.Length)
             {
-                j = _alphabet.IndexOfValue(values.ElementAt(i));
-                if (j == -1)
+                var nexts = _alphabet.ValuesFrom(input.Substring(i));
+                if (!nexts.Any())
                     return false;
-
-                temp = _transitions[curr][j];
-                if (!temp.HasValue)
+                
+                for(j = 0; j < nexts.Count; j++)
+                {
+                    aux = _alphabet.IndexOfValue(nexts[j]);
+                    temp = _transitions[curr][aux];
+                    if (temp.HasValue) 
+                    {
+                        curr = temp.Value;
+                        i += nexts[j].Length;
+                        break;
+                    }
+                }
+                
+                if(j < nexts.Count -1)
                     return false;
-
-                curr = temp.Value;
-            }*/
+            }
 
             return _transitions[curr][ACCEPTCOL] == ACCEPT;
         }

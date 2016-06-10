@@ -4,13 +4,12 @@ using Xunit;
 namespace Automata.Test
 {
     /*************
-    * implementar match sequencial
     * preparar injeção de optimizer 
     * implementar nondeterministic
     * implementar regex
     * testar cast
     ************/
-    public class ExamplesTest
+    public class NonDeterministicTest
     {
         [Fact]
         public void Example1Test()
@@ -271,7 +270,7 @@ namespace Automata.Test
                 "five dollar",
                 "ninety seven cent"
             };
-            
+                
             for(int j = 0; j < matches.Length; j++)
                 Assert.True(money.IsMatch(matches[j].Split(' ')), matches[j]);
                 
@@ -314,9 +313,6 @@ namespace Automata.Test
                 
                 Assert.True(money.Matches(temp.Split(' ')).Count == n, $"{temp} {money.Matches(temp.Split(' ')).Count} <> {n}");
             }
-            
-                
-            //money.Match();
         }
     }
 }

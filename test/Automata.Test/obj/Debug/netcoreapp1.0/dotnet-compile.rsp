@@ -111,4 +111,5 @@
 --reference:/home/michael/.nuget/packages/xunit.runner.utility/2.1.0/lib/dotnet/xunit.runner.utility.dotnet.dll
 --reference:/home/michael/github/automata.net/src/Automata.Console/bin/Debug/netcoreapp1.0/Automata.Console.dll
 --reference:/home/michael/github/automata.net/src/Automata.Core/bin/Debug/netstandard1.5/Automata.Core.dll
-/home/michael/github/automata.net/test/Automata.Test/ExamplesTest.cs
+/home/michael/github/automata.net/test/Automata.Test/NonDeterministicTest.cs
+/home/michael/github/automata.net/test/Automata.Test/DeterministicTest.cs

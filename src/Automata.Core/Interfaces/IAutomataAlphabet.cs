@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 
 namespace Automata.Core.Interfaces
 {
@@ -11,5 +11,7 @@ namespace Automata.Core.Interfaces
         int IndexOf(object key);
 
         int IndexOfValue(object value);
+
+        List<string> ValuesFrom(string value);
     }
 }

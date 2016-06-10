@@ -65,5 +65,15 @@ namespace Automata.Core.Alphabet
                 
             return true;
         }
+
+        public List<string> ValuesFrom(string value)
+        {
+            var list = new List<string>();
+            
+            for(int i = 0; i < Length; i++)
+                if(value.StartsWith(_symbols[i].ToString())) list.Add(_symbols[i].ToString());
+            
+            return list;
+        }
     }
 }

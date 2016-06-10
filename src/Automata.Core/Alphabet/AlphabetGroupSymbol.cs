@@ -32,12 +32,19 @@ namespace Automata.Core.Alphabet
             for (int i = 0; i < _values.Length; i++)
                 _values[i] = values[i];
         }
-                
+        
         public bool HasValue(object value)
         {
             for(int i = 0; i < _values.Length; i++)
                 if(_values[i].Equals(value)) return true;
             return false;
+        }
+        
+        public string ValueInStartOf(string value)
+        {
+            for(int i = 0; i < _values.Length; i++)
+                if(value.StartsWith(_values[i].ToString())) return _values[i].ToString();
+            return string.Empty;
         }
     }
 }
