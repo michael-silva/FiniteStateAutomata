@@ -83,6 +83,9 @@ namespace Automata.Core.FiniteState
                 
         public void AcceptState(int index)
         {
+            if(index < 0 || index >= _transitions.Count)
+                throw new Exception("The Index is out of transitions range ");
+                
             if(index < _firstAccept)
                 _firstAccept = index;
                 
@@ -266,7 +269,7 @@ namespace Automata.Core.FiniteState
             return this;
         }
 
-        public NonDeterministicAutomata<IComparable> ToNonDeterministic()
+        public NonDeterministicAutomata ToNonDeterministic()
         {
             var ttable = new List<List<int>[]>();
             for (int i = 0; i < _transitions.Count; i++)
@@ -294,7 +297,6 @@ namespace Automata.Core.FiniteState
         }
         
         private bool AnyMatch<T>(ICollection<T> values)
-            where T : IComparable
         {
             int i = 0, j = 0, curr = 0;
             int start = -1;
@@ -328,7 +330,6 @@ namespace Automata.Core.FiniteState
         }
         
         private List<int[]> Matches<T>(ICollection<T> values)
-            where T : IComparable
         {
             var matches = new List<int[]>();
             int i = 0, j = 0, curr = 0;
@@ -341,7 +342,7 @@ namespace Automata.Core.FiniteState
                 {
                     if(end > -1) 
                     {
-                        i = end;
+                        i = end - 1;
                         matches.Add(new [] { start, end });
                     }
                     start = end = -1;
@@ -371,35 +372,6 @@ namespace Automata.Core.FiniteState
         public bool IsMatch(params char[] values)
         {
             return IsMatch<char>(values);
-        }
-        
-        public bool Match(string input)
-        {
-            int i = 0, j = 0, curr = 0, aux = 0;
-            int? temp = null;
-            while (i < input.Length)
-            {
-                var nexts = _alphabet.ValuesFrom(input.Substring(i));
-                if (!nexts.Any())
-                    return false;
-                
-                for(j = 0; j < nexts.Count; j++)
-                {
-                    aux = _alphabet.IndexOfValue(nexts[j]);
-                    temp = _transitions[curr][aux];
-                    if (temp.HasValue) 
-                    {
-                        curr = temp.Value;
-                        i += nexts[j].Length;
-                        break;
-                    }
-                }
-                
-                if(j < nexts.Count -1)
-                    return false;
-            }
-
-            return _transitions[curr][ACCEPTCOL] == ACCEPT;
         }
         
         private bool IsMatch<T>(ICollection<T> values)
@@ -434,7 +406,6 @@ namespace Automata.Core.FiniteState
         }
         
         private bool BeginMatch<T>(ICollection<T> values)
-            where T : IComparable
         {
             int i = 0, j = 0, curr = 0;
             int? temp = null;
@@ -465,11 +436,40 @@ namespace Automata.Core.FiniteState
         }
         
         public bool EndMatch<T>(ICollection<T> values)
-            where T : IComparable
         {
             var matches = Matches(values);
             return matches.Count > 0 && matches.Last()[1] == values.Count - 1;
         }
+        
+        /*public bool Match(string input)
+        {
+            int i = 0, j = 0, curr = 0, aux = 0;
+            int? temp = null;
+            while (i < input.Length)
+            {
+                var nexts = _alphabet.ValuesFrom(input.Substring(i));
+                if (!nexts.Any())
+                    return false;
+                
+                for(j = 0; j < nexts.Count; j++)
+                {
+                    System.Console.WriteLine($"{j} {nexts[j]} {nexts.Count}");
+                    aux = _alphabet.IndexOfValue(nexts[j]);
+                    temp = _transitions[curr][aux];
+                    if (temp.HasValue) 
+                    {
+                        curr = temp.Value;
+                        i += nexts[j].Length;
+                        break;
+                    }
+                }
+                
+                if(j < nexts.Count -1)
+                    return false;
+            }
+
+            return _transitions[curr][ACCEPTCOL] == ACCEPT;
+        }*/
         #endregion
     }
 }

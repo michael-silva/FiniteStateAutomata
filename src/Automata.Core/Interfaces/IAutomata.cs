@@ -12,6 +12,7 @@ namespace Automata.Core.Interfaces
         void AddTransition(int symbolIndex, int fromState, int toState);
         void AcceptState(int index);
         IAutomata Clone();
+        
         bool Equals(IAutomata value);
         //bool Match(string value);
 

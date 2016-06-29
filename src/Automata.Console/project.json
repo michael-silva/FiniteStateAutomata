@@ -10,7 +10,7 @@
     "dependencies":{
         "Microsoft.NETCore.App": {
             "type": "platform",
-            "version": "1.0.0-r2-*"
+            "version": "1.0.0"
         },
         "Automata.Core":{
             "type": "build",

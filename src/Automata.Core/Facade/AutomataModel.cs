@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Automata.Core.Alphabet;
 using Automata.Core.FiniteState;
 using Automata.Core.Interfaces;
 
@@ -13,6 +12,7 @@ namespace Automata.Core.Facade
         private List<string> _states;
         private int _currState;
         private int _currSymbol;
+        private bool _isEpsilon;
         
         private void CreateState(string name)
         {
@@ -23,7 +23,7 @@ namespace Automata.Core.Facade
         {
             for(int i = 0; i < _states.Count; i++)
                 if(_states[i].Equals(name)) return i;
-                
+            
             CreateState(name);
             return _states.Count - 1;
         }
@@ -36,14 +36,25 @@ namespace Automata.Core.Facade
             CreateState("");
         }
 
+        public AutomataModel<T> Epsilon()
+        {
+            if (_automata is NonDeterministicAutomata)
+                _isEpsilon = true;
+            else
+                throw new Exception($"The Epsilon method is only enabled to NonDeterministic Automatas!");
+            return this;
+        }
+
         private AutomataModel<T> When(int index, IComparable value)
         {
             if (index == -1)
                 throw new Exception($"The symbol '{value}' don't exist in alphabet!");
 
             _currSymbol = index;
+            _isEpsilon = false;
             return this;
         }
+
         public AutomataModel<T> When(string value)
         {
             var index = _automata.Alphabet.IndexOf(value);
@@ -58,13 +69,19 @@ namespace Automata.Core.Facade
 
         public AutomataModel<T> ToNext()
         {
-            _automata.AddTransition(_currSymbol, _currState, _currState + 1);
+            if(_isEpsilon)
+                (_automata as NonDeterministicAutomata).AddEpsilon(_currState, _currState + 1);
+            else
+                _automata.AddTransition(_currSymbol, _currState, _currState + 1);
             return this;
         }
         
         public AutomataModel<T> ToPrev()
         {
-            _automata.AddTransition(_currSymbol, _currState, _currState - 1);
+            if(_isEpsilon)
+                (_automata as NonDeterministicAutomata).AddEpsilon(_currState, _currState - 1);
+            else
+                _automata.AddTransition(_currSymbol, _currState, _currState - 1);
             return this;
         }
         
@@ -77,7 +94,10 @@ namespace Automata.Core.Facade
         
         public AutomataModel<T> To(int index)
         {
-            _automata.AddTransition(_currSymbol, _currState, index);
+            if(_isEpsilon)
+                (_automata as NonDeterministicAutomata).AddEpsilon(_currState, index);
+            else
+                _automata.AddTransition(_currSymbol, _currState, index);
             return this;
         }
         

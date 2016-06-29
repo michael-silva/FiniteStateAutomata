@@ -1,23 +1,18 @@
-using Automata.Console;
+using System.Collections.Generic;
+using Automata.Console.Samples;
 using Xunit;
 
 namespace Automata.Test
 {
-    /*************
-    * preparar injeção de optimizer 
-    * implementar nondeterministic
-    * implementar regex
-    * testar cast
-    ************/
     public class DeterministicTest
     {
         [Fact]
         public void Example1Test()
         {
             var sheeptalks = new [] {
-                Samples.Sheeptalk1(),
-                Samples.Sheeptalk2(),
-                Samples.Sheeptalk3()
+                Deterministics.Sheeptalk1(),
+                Deterministics.Sheeptalk2(),
+                Deterministics.Sheeptalk3()
             };
             
             var matches = new [] {
@@ -48,7 +43,7 @@ namespace Automata.Test
         public void Example2Test()
         {
             var sheeptalks = new [] {
-                Samples.StuttererSeeptalk(),
+                Deterministics.StuttererSeeptalk(),
             };
             
             var matches = new [] {
@@ -81,9 +76,9 @@ namespace Automata.Test
         public void Example3Test()
         {
             var sheeptalks = new [] {
-                Samples.Sheeptalk1().Closure(),
-                Samples.Sheeptalk2().Closure(),
-                Samples.Sheeptalk3().Closure()
+                Deterministics.Sheeptalk1().Closure(),
+                Deterministics.Sheeptalk2().Closure(),
+                Deterministics.Sheeptalk3().Closure()
             };
             
             var matches = new [] {
@@ -118,7 +113,7 @@ namespace Automata.Test
         public void Example4Test()
         {
             var sheeptalks = new [] {
-                Samples.Sheeptalk2().Union(Samples.StuttererSeeptalk())
+                Deterministics.Sheeptalk2().Union(Deterministics.StuttererSeeptalk())
             };
             
             var matches = new [] {
@@ -152,7 +147,7 @@ namespace Automata.Test
         public void Example5Test()
         {
             var sheeptalks = new [] {
-                Samples.Sheeptalk2().Intersection(Samples.StuttererSeeptalk())
+                Deterministics.Sheeptalk2().Intersection(Deterministics.StuttererSeeptalk())
             };
             
             var matches = new [] {
@@ -186,7 +181,7 @@ namespace Automata.Test
         public void Example6Test()
         {
             var sheeptalks = new [] {
-                Samples.Sheeptalk2().Concat(Samples.StuttererSeeptalk())
+                Deterministics.Sheeptalk2().Concat(Deterministics.StuttererSeeptalk())
             };
             
             var matches = new [] {
@@ -219,51 +214,29 @@ namespace Automata.Test
         [Fact]
         public void Example7Test()
         {
-            var sheeptalks = new [] {
-                Samples.Sheeptalk2().Concat(Samples.StuttererSeeptalk())
-            };
+            var money = Deterministics.Money();
             
-            var matches = new [] {
-                "baa!baaaaaaaaaaaaaaaaaabaa!",
-                "baaaaaaaaaaaaaaaaaa!baabaa!",
+            var tempMatches = new List<string>() {
+                "twenty one dollars",
+                "sixty dollars",
+                "seventeen dollars",
+                "nine dollars",
+                "one dollar", 
+                "seventy six cents",
+                "sixty cents",
+                "seventeen cents",
+                "nine cents",
+                "one cent"
             };
-            
+
+            int length = tempMatches.Count;
+            for(int i = 0; i < length / 2; i++)
+                for(int j = length / 2; j < length; j++)
+                    tempMatches.Add(tempMatches[i] + " " + tempMatches[j]);
+
+            var matches = tempMatches.ToArray();
             var unmatches = new [] {
-                "ba!",
-                "bbaa!",
-                "baaaba!",
-                "baaabaaaa",
-                "babaaa!",
-                "bbaa!",
-                "baaa",
-                "baabaa!",
-                "baaaaaaaaaaaaaaaaaabaabaaaaa!"
-            };
-            
-            for(int i = 0; i < sheeptalks.Length; i++)
-            {
-                for(int j = 0; j < matches.Length; j++)
-                    Assert.True(sheeptalks[i].IsMatch(matches[j].ToCharArray()), matches[j]);
-                    
-                for(int j = 0; j < unmatches.Length; j++)
-                    Assert.False(sheeptalks[i].IsMatch(unmatches[j].ToCharArray()), unmatches[j]);
-            }
-        }
-        
-        [Fact]
-        public void Example8Test()
-        {
-            var money = Samples.Money();
-            
-            var matches = new [] { 
-                "twenty one dollars one cent",
-                "eleven dollars five cents",
-                "one dollar ten cents",
-                "five dollars",
-                "ninety cents"
-            };
-            
-            var unmatches = new [] { 
+                "ninety",
                 "twenty one dollar one cents",
                 "eleven one dollars five cent",
                 "one dollars ten",
@@ -301,7 +274,7 @@ namespace Automata.Test
                 Assert.True(money.AnyMatch(temp.Split(' ')), temp);
             }
                 
-            for(int j = 0; j < matches.Length; j++)
+            for(int j = 0; j < unmatches.Length; j++)
                 Assert.False(money.AnyMatch(unmatches[j].Split(' ')), unmatches[j]);
             
             for(int j = 0; j < matches.Length; j++)
@@ -311,8 +284,12 @@ namespace Automata.Test
                 for(int z = 0; z < n; z++)
                     temp += ((z % 2 == 0 ? "teste " : "") + matches[j] + (z > n / 2 ? " teste" : "")) + " ";
                 
-                Assert.True(money.Matches(temp.Split(' ')).Count == n, $"{temp} {money.Matches(temp.Split(' ')).Count} <> {n}");
+                var results = money.Matches(temp.Split(' '));
+                Assert.True(results.Count == n, $"{temp} {results.Count} <> {n}");
             }
+
+            //for(int j = 0; j < matches.Length; j++)
+            //    Assert.True(money.Match(matches[j].Replace(" ", "")), matches[j]);
         }
     }
 }

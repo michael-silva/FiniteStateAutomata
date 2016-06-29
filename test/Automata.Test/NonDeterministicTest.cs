@@ -1,23 +1,17 @@
-using Automata.Console;
+using System.Collections.Generic;
+using Automata.Console.Samples;
 using Xunit;
 
 namespace Automata.Test
 {
-    /*************
-    * preparar injeção de optimizer 
-    * implementar nondeterministic
-    * implementar regex
-    * testar cast
-    ************/
     public class NonDeterministicTest
     {
         [Fact]
         public void Example1Test()
         {
             var sheeptalks = new [] {
-                Samples.Sheeptalk1(),
-                Samples.Sheeptalk2(),
-                Samples.Sheeptalk3()
+                NonDeterministics.Sheeptalk1(),
+                NonDeterministics.Sheeptalk2()
             };
             
             var matches = new [] {
@@ -48,7 +42,7 @@ namespace Automata.Test
         public void Example2Test()
         {
             var sheeptalks = new [] {
-                Samples.StuttererSeeptalk(),
+                NonDeterministics.StuttererSeeptalk(),
             };
             
             var matches = new [] {
@@ -81,9 +75,8 @@ namespace Automata.Test
         public void Example3Test()
         {
             var sheeptalks = new [] {
-                Samples.Sheeptalk1().Closure(),
-                Samples.Sheeptalk2().Closure(),
-                Samples.Sheeptalk3().Closure()
+                NonDeterministics.Sheeptalk1().Closure(),
+                NonDeterministics.Sheeptalk2().Closure()
             };
             
             var matches = new [] {
@@ -118,7 +111,8 @@ namespace Automata.Test
         public void Example4Test()
         {
             var sheeptalks = new [] {
-                Samples.Sheeptalk2().Union(Samples.StuttererSeeptalk())
+                NonDeterministics.StuttererSeeptalk().Union(NonDeterministics.Sheeptalk1()),
+                NonDeterministics.Sheeptalk2().Union(NonDeterministics.StuttererSeeptalk())
             };
             
             var matches = new [] {
@@ -148,11 +142,12 @@ namespace Automata.Test
             }
         }
         
+        /*
         [Fact]
         public void Example5Test()
         {
             var sheeptalks = new [] {
-                Samples.Sheeptalk2().Intersection(Samples.StuttererSeeptalk())
+                NonDeterministics.Sheeptalk2().Intersection(NonDeterministics.StuttererSeeptalk())
             };
             
             var matches = new [] {
@@ -180,47 +175,13 @@ namespace Automata.Test
                 for(int j = 0; j < unmatches.Length; j++)
                     Assert.False(sheeptalks[i].IsMatch(unmatches[j].ToCharArray()), unmatches[j]);
             }
-        }
+        }*/
         
         [Fact]
         public void Example6Test()
         {
             var sheeptalks = new [] {
-                Samples.Sheeptalk2().Concat(Samples.StuttererSeeptalk())
-            };
-            
-            var matches = new [] {
-                "baa!baaaaaaaaaaaaaaaaaabaa!",
-                "baaaaaaaaaaaaaaaaaa!baabaa!",
-            };
-            
-            var unmatches = new [] {
-                "ba!",
-                "bbaa!",
-                "baaaba!",
-                "baaabaaaa",
-                "babaaa!",
-                "bbaa!",
-                "baaa",
-                "baabaa!",
-                "baaaaaaaaaaaaaaaaaabaabaaaaa!"
-            };
-            
-            for(int i = 0; i < sheeptalks.Length; i++)
-            {
-                for(int j = 0; j < matches.Length; j++)
-                    Assert.True(sheeptalks[i].IsMatch(matches[j].ToCharArray()), matches[j]);
-                    
-                for(int j = 0; j < unmatches.Length; j++)
-                    Assert.False(sheeptalks[i].IsMatch(unmatches[j].ToCharArray()), unmatches[j]);
-            }
-        }
-        
-        [Fact]
-        public void Example7Test()
-        {
-            var sheeptalks = new [] {
-                Samples.Sheeptalk2().Concat(Samples.StuttererSeeptalk())
+                NonDeterministics.Sheeptalk2().Concat(NonDeterministics.StuttererSeeptalk())
             };
             
             var matches = new [] {
@@ -253,56 +214,68 @@ namespace Automata.Test
         [Fact]
         public void Example8Test()
         {
-            var money = Samples.Money();
+            var money = NonDeterministics.Money();
             
-            var matches = new [] { 
-                "twenty one dollars one cent",
-                "eleven dollars five cents",
-                "one dollar ten cents",
-                "five dollars",
-                "ninety cents"
+            var tempMatches = new List<string>() {
+                "twenty one dollars",
+                "sixty dollars",
+                "seventeen dollars",
+                "nine dollars",
+                "one dollar", 
+                "seventy six cents",
+                "sixty cents",
+                "seventeen cents",
+                "nine cents",
+                "one cent"
             };
-            
-            var unmatches = new [] { 
+
+            int length = tempMatches.Count;
+            for(int i = 0; i < length / 2; i++)
+                for(int j = length / 2; j < length; j++)
+                    tempMatches.Add(tempMatches[i] + " " + tempMatches[j]);
+
+            var matches = tempMatches.ToArray();
+            var unmatches = new [] {
                 "twenty one dollar one cents",
                 "eleven one dollars five cent",
-                "one dollars ten",
+                "ninety",
+                "one dollars",
                 "five dollar",
                 "ninety seven cent"
             };
                 
             for(int j = 0; j < matches.Length; j++)
-                Assert.True(money.IsMatch(matches[j].Split(' ')), matches[j]);
+                Assert.True(money.IsMatch(matches[j].Split(' ')), "Test Ismatch: " + matches[j]);
                 
             for(int j = 0; j < unmatches.Length; j++)
-                Assert.False(money.IsMatch(unmatches[j].Split(' ')), unmatches[j]);
+                Assert.False(money.IsMatch(unmatches[j].Split(' ')), "Test Ismatch: " + unmatches[j]);
                 
             for(int j = 0; j < matches.Length; j++)
-                Assert.True(money.SplitMatch(matches[j], ' '), matches[j]);
+                Assert.True(money.SplitMatch(matches[j], ' '), "Test Splitmatch: " + matches[j]);
                 
             for(int j = 0; j < unmatches.Length; j++)
-                Assert.False(money.SplitMatch(unmatches[j], ' '), unmatches[j]);
+                Assert.False(money.SplitMatch(unmatches[j], ' '), "Test Splitmatch: " + unmatches[j]);
                 
             for(int j = 0; j < matches.Length; j++)
-                Assert.True(money.BeginMatch((matches[j] + (j % 2 == 0 ? " teste" : "")).Split(' ')), matches[j] + (j % 2 == 0 ? " teste" : ""));
+                Assert.True(money.BeginMatch((matches[j] + (j % 2 == 0 ? " teste" : "")).Split(' ')), "Test Beginmatch: " + matches[j] + (j % 2 == 0 ? " teste" : ""));
                 
             for(int j = 0; j < matches.Length; j++)
-                Assert.False(money.BeginMatch(("teste " + matches[j]).Split(' ')),  "teste " + matches[j]);
+                Assert.False(money.BeginMatch(("teste " + matches[j]).Split(' ')),  "Test Beginmatch: teste " + matches[j]);
                 
             for(int j = 0; j < matches.Length; j++)
-                Assert.True(money.EndMatch(((j % 2 == 0 ? "teste " : "") + matches[j]).Split(' ')), matches[j]);
+                Assert.True(money.EndMatch(((j % 2 == 0 ? "teste " : "") + matches[j]).Split(' ')), "Test Endmatch: " + matches[j]);
                 
             for(int j = 0; j < matches.Length; j++)
-                Assert.False(money.EndMatch((matches[j] + " teste").Split(' ')), matches[j] + " teste");
+                Assert.False(money.EndMatch((matches[j] + " teste").Split(' ')), "Test Endmatch: " + matches[j] + " teste");
                 
             for(int j = 0; j < matches.Length; j++)
             {
                 string temp = ((j % 2 == 0 ? "teste " : "") + matches[j] + (j > matches.Length / 2 ? " teste" : ""));
-                Assert.True(money.AnyMatch(temp.Split(' ')), temp);
+                Assert.True(money.AnyMatch(temp.Split(' ')), "Test Anymatch: " + temp);
             }
                 
-            for(int j = 0; j < matches.Length; j++)
-                Assert.False(money.AnyMatch(unmatches[j].Split(' ')), unmatches[j]);
+            for(int j = 2; j < unmatches.Length; j++)
+                Assert.False(money.AnyMatch(unmatches[j].Split(' ')), "Test Anymatch: " + unmatches[j]);
             
             for(int j = 0; j < matches.Length; j++)
             {
@@ -310,8 +283,8 @@ namespace Automata.Test
                 string temp = "";
                 for(int z = 0; z < n; z++)
                     temp += ((z % 2 == 0 ? "teste " : "") + matches[j] + (z > n / 2 ? " teste" : "")) + " ";
-                
-                Assert.True(money.Matches(temp.Split(' ')).Count == n, $"{temp} {money.Matches(temp.Split(' ')).Count} <> {n}");
+                var results = money.Matches(temp.Split(' '));
+                Assert.True(results.Count == n, $"{temp} {results.Count} <> {n}");
             }
         }
     }

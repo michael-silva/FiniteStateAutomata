@@ -5,10 +5,10 @@
     
     "dependencies": {
         "xunit": "2.2.0-*",
-        "dotnet-test-xunit": "1.0.0-rc2-*",
+        "dotnet-test-xunit": "1.0.0-*",
         "Microsoft.NETCore.App": { 
             "type": "platform",
-            "version": "1.0.0-r2-*"
+            "version": "1.0.0"
         },
         "Automata.Core": {
             "type": "build",

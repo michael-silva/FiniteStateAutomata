@@ -2,9 +2,9 @@ using Automata.Core.FiniteState;
 using Automata.Core.Alphabet;
 using Automata.Core.Facade;
 
-namespace Automata.Console
+namespace Automata.Console.Samples
 {   
-    public static class Samples
+    public static class Deterministics
     {
         public static DeterministicAutomata Sheeptalk1()
 		{
@@ -120,7 +120,7 @@ namespace Automata.Console
                             .When("plural1").To("q2")
                             .When("plural2").To("q2")
                             .When("tens").To("q1")
-                        .On("q1").Accept()
+                        .On("q1")
                             .When("cents").To("q7")
                             .When("dollars").To("q4")
                             .When("single").To("q2")

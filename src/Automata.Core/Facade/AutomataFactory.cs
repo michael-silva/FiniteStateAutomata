@@ -23,11 +23,11 @@ namespace Automata.Core.Facade
             var a = new DeterministicAutomata(_alphabet);
             return new AutomataModel<DeterministicAutomata>(a);
         }
-        
-        /*public FluentAutomata<T> NonDeterministic()
+
+        public AutomataModel<NonDeterministicAutomata> NonDeterministic()
         {
-            var a =  new NonDeterministicAutomata<T>(_alphabet);
-            return new FluentAutomata<T>(a);
+            var a = new NonDeterministicAutomata(_alphabet);
+            return new AutomataModel<NonDeterministicAutomata>(a);
         }
         
         /*public FluentAutomata<T> RegularExpression()
