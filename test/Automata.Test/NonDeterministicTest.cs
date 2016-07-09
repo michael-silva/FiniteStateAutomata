@@ -142,7 +142,6 @@ namespace Automata.Test
             }
         }
         
-        /*
         [Fact]
         public void Example5Test()
         {
@@ -175,7 +174,7 @@ namespace Automata.Test
                 for(int j = 0; j < unmatches.Length; j++)
                     Assert.False(sheeptalks[i].IsMatch(unmatches[j].ToCharArray()), unmatches[j]);
             }
-        }*/
+        }
         
         [Fact]
         public void Example6Test()
@@ -212,7 +211,7 @@ namespace Automata.Test
         }
         
         [Fact]
-        public void Example8Test()
+        public void Example7Test()
         {
             var money = NonDeterministics.Money();
             
@@ -286,6 +285,46 @@ namespace Automata.Test
                 var results = money.Matches(temp.Split(' '));
                 Assert.True(results.Count == n, $"{temp} {results.Count} <> {n}");
             }
+        }
+        
+        [Fact]
+        public void Example8Test()
+        {
+            var money = NonDeterministics.Money().ToDeterministic();
+            
+            var tempMatches = new List<string>() {
+                "twenty one dollars",
+                "sixty dollars",
+                "seventeen dollars",
+                "nine dollars",
+                "one dollar", 
+                "sixty cents",
+                "seventy six cents",
+                "seventeen cents",
+                "nine cents",
+                "one cent"
+            };
+
+            int length = tempMatches.Count;
+            for(int i = 0; i < length / 2; i++)
+                for(int j = length / 2; j < length; j++)
+                    tempMatches.Add(tempMatches[i] + " " + tempMatches[j]);
+
+            var matches = tempMatches.ToArray();
+            var unmatches = new [] {
+                "ninety",
+                "twenty one dollar one cents",
+                "eleven one dollars five cent",
+                "one dollars ten",
+                "five dollar",
+                "ninety seven cent"
+            };
+                
+            for(int j = 0; j < matches.Length; j++)
+                Assert.True(money.IsMatch(matches[j].Split(' ')), matches[j]);
+                
+            for(int j = 0; j < unmatches.Length; j++)
+                Assert.False(money.IsMatch(unmatches[j].Split(' ')), unmatches[j]);        
         }
     }
 }

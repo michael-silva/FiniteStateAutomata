@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Automata.Core.Interfaces;
 
@@ -9,6 +8,11 @@ namespace Automata.Core.Alphabet
         private List<object> _symbols;
         
         public int Length { get { return _symbols.Count; } }
+
+        private AutomataAlphabet(List<object> symbols)
+        { 
+            _symbols = symbols;
+        }
 
         public AutomataAlphabet()
         { 

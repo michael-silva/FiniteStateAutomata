@@ -291,5 +291,45 @@ namespace Automata.Test
             //for(int j = 0; j < matches.Length; j++)
             //    Assert.True(money.Match(matches[j].Replace(" ", "")), matches[j]);
         }
+
+        [Fact]
+        public void Example8Test()
+        {
+            var money = Deterministics.Money().ToNonDeterministic();
+            
+            var tempMatches = new List<string>() {
+                "twenty one dollars",
+                "sixty dollars",
+                "seventeen dollars",
+                "nine dollars",
+                "one dollar", 
+                "seventy six cents",
+                "sixty cents",
+                "seventeen cents",
+                "nine cents",
+                "one cent"
+            };
+
+            int length = tempMatches.Count;
+            for(int i = 0; i < length / 2; i++)
+                for(int j = length / 2; j < length; j++)
+                    tempMatches.Add(tempMatches[i] + " " + tempMatches[j]);
+
+            var matches = tempMatches.ToArray();
+            var unmatches = new [] {
+                "twenty one dollar one cents",
+                "eleven one dollars five cent",
+                "ninety",
+                "one dollars",
+                "five dollar",
+                "ninety seven cent"
+            };
+                
+            for(int j = 0; j < matches.Length; j++)
+                Assert.True(money.IsMatch(matches[j].Split(' ')), "Test Ismatch: " + matches[j]);
+                
+            for(int j = 0; j < unmatches.Length; j++)
+                Assert.False(money.IsMatch(unmatches[j].Split(' ')), "Test Ismatch: " + unmatches[j]);
+        }
     }
 }

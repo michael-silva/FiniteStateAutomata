@@ -5,7 +5,7 @@ using Automata.Core.Interfaces;
 
 namespace Automata.Core.FiniteState
 {
-    public class DeterministicAutomata : IAutomata
+    public class DeterministicAutomata : IAutomata, IAutomataTableBuilder
     {
         #region Properties and Constants
         private const int ACCEPT = 1;
@@ -17,6 +17,7 @@ namespace Automata.Core.FiniteState
         private IAutomataAlphabet _alphabet;
         private List<int?[]> _transitions;
         
+        public IAutomataOptimizer<List<int?[]>> Optimizer { get; set; }
         public IAutomataAlphabet Alphabet { get { return _alphabet; } }
         public bool Acceptance { get { return _acceptCount > 0; } }
         public bool Empty { get { return _alphabet.Length == 0; } }
@@ -24,7 +25,7 @@ namespace Automata.Core.FiniteState
         #endregion
 
         #region Constructors
-        private DeterministicAutomata(IAutomataAlphabet alphabet, List<int?[]> transitions)
+        internal DeterministicAutomata(IAutomataAlphabet alphabet, List<int?[]> transitions)
         {
             ACCEPTCOL = alphabet.Length;
             LENGTH = alphabet.Length + 1;
@@ -36,7 +37,7 @@ namespace Automata.Core.FiniteState
                 _transitions = transitions;
                 
             for(int i = 0; i < _transitions.Count; i++)
-                if(_transitions[i][ACCEPTCOL] == ACCEPT) _acceptCount++;
+                if(IsAcceptState(i)) _acceptCount++;
         }
         
         public DeterministicAutomata(IAutomataAlphabet alphabet)
@@ -101,6 +102,11 @@ namespace Automata.Core.FiniteState
         #endregion
 
         #region Operations methods
+        private bool IsAcceptState(int index)
+        {
+            return _transitions[index][ACCEPTCOL] == ACCEPT;
+        }
+
         private bool SameAlphabet(DeterministicAutomata automata)
         {
             return automata.Alphabet.Equals(_alphabet);
@@ -131,7 +137,7 @@ namespace Automata.Core.FiniteState
                         }
                     }
                 
-                    if((i < _transitions.Count && _transitions[i][ACCEPTCOL] == ACCEPT) 
+                    if((i < _transitions.Count && IsAcceptState(i)) 
                         && (j < automata._transitions.Count && automata._transitions[j][ACCEPTCOL] == ACCEPT))
                     {
                         //System.Console.WriteLine($"{(i * (automata._transitions.Count + 1)) + j}");
@@ -238,11 +244,6 @@ namespace Automata.Core.FiniteState
 
             return new DeterministicAutomata(_alphabet, ttable);
         }
-
-        public DeterministicAutomata Reverse()
-        {
-            return this;//ToNonDeterministic().Reverse().ToDeterministic().Optimize();
-        }
         #endregion
 
         #region Utilities methods
@@ -251,21 +252,21 @@ namespace Automata.Core.FiniteState
             return new DeterministicAutomata(_alphabet, new List<int?[]>(_transitions.ToArray()));
         }
 
-        public bool SubsetOf(DeterministicAutomata automata)
+        public bool SubsetOf(IAutomata automata)
         {
-            return !Intersection(automata).Empty;
+            return automata is DeterministicAutomata 
+                    && !Intersection(automata as DeterministicAutomata).Empty;
         }
         
         public bool Equals(IAutomata other)
         {
-            return other is DeterministicAutomata 
-                    && SubsetOf(other as DeterministicAutomata) 
-                    && (other as DeterministicAutomata).SubsetOf(this);
+            return SubsetOf(other) && other.SubsetOf(this);
         }
 
         public DeterministicAutomata Optimize()
         {
-            //inject optimize algorithm
+            if(Optimizer != null) 
+                _transitions = Optimizer.Optimize(this, _transitions);
             return this;
         }
 
@@ -274,14 +275,17 @@ namespace Automata.Core.FiniteState
             var ttable = new List<List<int>[]>();
             for (int i = 0; i < _transitions.Count; i++)
             {
-                ttable.Add(new List<int>[LENGTH]);
-                for (int j = 0; j < LENGTH; j++)
+                ttable.Add(new List<int>[LENGTH+1]);
+                for (int j = 0; j < LENGTH-1; j++)
                 {
-                    //ttable[i][j] = new List<int>() { _transitions[i][j] };
+                    if(_transitions[i][j].HasValue)
+                        ttable[i][j] = new List<int> { _transitions[i][j].Value };
                 }
+                if(_transitions[i][LENGTH-1].HasValue)
+                    ttable[i][LENGTH] = new List<int> { _transitions[i][LENGTH-1].Value };
             }
 
-            return null;//new NonDeterministicAutomata(_alphabet, ttable);
+            return new NonDeterministicAutomata(_alphabet, ttable);
         }
         #endregion
 
@@ -375,7 +379,6 @@ namespace Automata.Core.FiniteState
         }
         
         private bool IsMatch<T>(ICollection<T> values)
-            where T : IComparable
         {
             int i = 0, j = 0, curr = 0;
             int? temp = null;

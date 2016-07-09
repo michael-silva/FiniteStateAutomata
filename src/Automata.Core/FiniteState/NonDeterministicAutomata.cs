@@ -5,7 +5,7 @@ using Automata.Core.Interfaces;
 
 namespace Automata.Core.FiniteState
 {
-    public class NonDeterministicAutomata : IAutomata
+    public class NonDeterministicAutomata : IAutomata, IAutomataTableBuilder
     {
         #region Properties and Constants
         private const int ACCEPT = 1;
@@ -18,6 +18,7 @@ namespace Automata.Core.FiniteState
         private IAutomataAlphabet _alphabet;
         private List<List<int>[]> _transitions;
         
+        public IAutomataOptimizer<List<List<int>[]>> Optimizer { get; set; }
         public int Epsilon { get { return EPSILONCOL; } }
         public IAutomataAlphabet Alphabet { get { return _alphabet; } }
         public bool Acceptance { get { return _acceptCount > 0; } }
@@ -26,7 +27,7 @@ namespace Automata.Core.FiniteState
         #endregion
 
         #region Constructors
-        private NonDeterministicAutomata(IAutomataAlphabet alphabet, List<List<int>[]> transitions)
+        public NonDeterministicAutomata(IAutomataAlphabet alphabet, List<List<int>[]> transitions)
         {
             EPSILONCOL = alphabet.Length;
             ACCEPTCOL = alphabet.Length + 1;
@@ -39,36 +40,33 @@ namespace Automata.Core.FiniteState
             {
                 for(int i = 0; i < transitions.Count; i++)
                 {
+                    // string line = "";
                     if(transitions[i] != null)
                     {
                         _transitions.Add(new List<int>[LENGTH]);
                         for(int j = 0; j < transitions[i].Length; j++)
                         {
-                            System.Console.Write("[");
+                            // line += "[";
                             if(transitions[i][j] != null)
                             {
                                 _transitions[i][j] = new List<int>();
                                 for(int z = 0; z < transitions[i][j].Count; z++)
                                 {
-                                    System.Console.Write($"{transitions[i][j][z]}");
+                                    // line += $"{transitions[i][j][z]}";
+                                    // if(z < transitions[i][j].Count -1) 
+                                    //     line += ",";
                                     _transitions[i][j].Add(transitions[i][j][z]);
                                 }
                             }
-                            System.Console.Write("], ");
+                            //line += "], ";
                         }
-                        System.Console.WriteLine("");
+                        //System.Console.WriteLine(line);
                     }
                 }
-
-                if(_transitions.Count > 0 && _transitions[0][EPSILONCOL] != null && _transitions[0][EPSILONCOL].Count > 0)   
-                    System.Console.WriteLine($"{_transitions[0][EPSILONCOL][0]} {_transitions[0][EPSILONCOL].Count}");
             }
             
             for(int i = 0; i < _transitions.Count; i++)
                 if(_transitions[i][ACCEPTCOL] != null && _transitions[i][ACCEPTCOL].Any() && _transitions[i][ACCEPTCOL][0] == ACCEPT) _acceptCount++;
-
-            if(_transitions.Count > 0 && _transitions[0][EPSILONCOL] != null && _transitions[0][EPSILONCOL].Count > 0)   
-                System.Console.WriteLine($"{_transitions[0][EPSILONCOL][0]} {_transitions[0][EPSILONCOL].Count}");
         }
         
         public NonDeterministicAutomata(IAutomataAlphabet alphabet)
@@ -305,24 +303,6 @@ namespace Automata.Core.FiniteState
             
             return new NonDeterministicAutomata(_alphabet, ttable);
         }
-        
-        public NonDeterministicAutomata Reverse()
-        {
-            var ttable = new List<List<int>[]>();
-            /*var alphabet = _alphabet.GetNew();
-            
-            for(int i = 0; i < alphabet.Length; i++)
-                alphabet.Add(_alphabet.Length - i);
-            
-            for(int i = 0; i < _transitions.Count; i++)
-            {
-                var j = _transitions.Count - i;
-                ttable[j][ACCEPTCOL] = ACCEPT - ttable[j][ACCEPTCOL];
-            }
-            
-            return new NonDeterministicAutomata(alphabet, ttable);*/
-            return null;
-        }
         #endregion
 
         #region Utilities methods
@@ -347,9 +327,10 @@ namespace Automata.Core.FiniteState
             return new NonDeterministicAutomata(_alphabet, ttable);
         }
 
-        public bool SubsetOf(NonDeterministicAutomata automata)
+        public bool SubsetOf(IAutomata automata)
         {
-            return !Intersection(automata).Empty;
+            return automata is NonDeterministicAutomata 
+                    && !Intersection(automata as NonDeterministicAutomata).Empty;
         }
         
         public bool Equals(IAutomata other)
@@ -361,49 +342,104 @@ namespace Automata.Core.FiniteState
 
         public NonDeterministicAutomata Optimize()
         {
-            //inject optimize algorithm
+            if(Optimizer != null) 
+                _transitions = Optimizer.Optimize(this, _transitions);
             return this;
         }
 
         public DeterministicAutomata ToDeterministic()
-        {
-            /*
-            List<List<int>[]> _transitions;
-            var ttable = new List<int?[]>();
+        {   
             int i = 0;
-            var list = new List<int?>() { i };
-            list.AddRange(GetEpsilon(_transitions[0][EPSILONCOL]));
-            
-            while(i < ttable.Count)
+            int length = LENGTH - 1;
+            var ttable = new List<int?[]>() { new int?[length] };
+            var subsets = new List<List<int>>();
+            subsets.Add(GetEpsilons(0));
+            subsets[0].Add(0);
+            while(i < subsets.Count())
             {
-                for(int j = 0; j < _alphabet.Count; j++)
+                for(int z = 0; z < subsets[i].Count; z++)
+                    if(_transitions[subsets[i][z]][ACCEPTCOL] != null && _transitions[subsets[i][z]][ACCEPTCOL][0] == ACCEPT) ttable[i][length - 1] = ACCEPT;
+
+                for(int j = 0; j < _alphabet.Length; j++)
                 {
-                    var next = GetSubset(list[i], j);
-
-                    if(next.Count > 0)
+                    var subs = GetSubset(j, subsets[i]);
+                    if(subs != null && subs.Any())
                     {
-                        temp = list.index(next);
-
-                        if(temp == -1)
+                        int index = -1;
+                        for(int x = 0; x < subsets.Count; x++)
                         {
-                            temp = list.Count;
-                            
-                            list.Add(next);
-                            ttable.Add(new int?[LENGTH]);
+                            if(subs.Count == subsets[x].Count)
+                            {
+                                for(int z = 0; z < subsets[x].Count && subsets[x][z] == subs[z]; z++)
+                                    if(z == subsets[x].Count - 1) index = x;
+                                
+                                if(index >= 0) break;
+                            }
                         }
-
-                        ttable[i][j] = temp;
+                        
+                        if(index == -1)
+                        {
+                            index = subsets.Count;
+                            subsets.Add(subs);
+                        }
+                        ttable[i][j] = index;
                     }
                 }
+                // string line = "";
+                // for(int j = 0; j < length; j++)
+                //     line += $"[{ttable[i][j]}], ";
+                // System.Console.WriteLine(line);
+                i++;
+                ttable.Add(new int?[length]);
             }
             
-            return new DeterministicAutomata(_alphabet, ttable);*/
-            return null;
+            // System.Console.WriteLine("Subsets");
+            // for(i = 0; i < subsets.Count; i++) 
+            // {
+            //     string l = "";
+            //     for(int j = 0; j < subsets[i].Count; j++)
+            //         l += $"{subsets[i][j]}, ";
+            //     System.Console.WriteLine(l);
+            // }
+            return new DeterministicAutomata(_alphabet, ttable);
         }
         #endregion
         
         #region Match methods
-        
+        private List<int> GetSubset(int finded, List<int> subset)
+        {
+            var moves = new List<int>();
+            for(int j = 0; j < subset.Count; j++)
+            {
+                var aux = _transitions[subset[j]][finded];
+                if(aux != null)
+                    moves.AddRange(aux);
+                
+                aux = GetEpsilons(subset[j]);
+                if(aux != null)
+                {
+                    for(int i = 0; i < aux.Count; i++)
+                        if(_transitions[aux[i]][finded] != null) moves.AddRange(_transitions[aux[i]][finded]);
+                }
+            }
+            return moves;
+        }
+
+        private List<int> GetEpsilons(int state)
+        {
+            var epsilons = new List<int>();
+            
+            if(_transitions[state][EPSILONCOL] != null)
+                epsilons.AddRange(_transitions[state][EPSILONCOL]);
+
+            for(int j = 0; j < epsilons.Count; j++)
+            {
+                if(_transitions[epsilons[j]][EPSILONCOL] != null)
+                    epsilons.AddRange(_transitions[epsilons[j]][EPSILONCOL]);
+            }
+            return epsilons;
+        }
+
         private void GetMovesFromEpsilons(int finded, List<int> epsilons, List<int> moves)
         {
             int count = epsilons.Count;

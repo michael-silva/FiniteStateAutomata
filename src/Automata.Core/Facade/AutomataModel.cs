@@ -6,7 +6,7 @@ using Automata.Core.Interfaces;
 namespace Automata.Core.Facade
 {
     public class AutomataModel<T>
-        where T : IAutomata
+        where T : IAutomataTableBuilder
     {
         private IAutomata _automata;
         private List<string> _states;
@@ -72,7 +72,7 @@ namespace Automata.Core.Facade
             if(_isEpsilon)
                 (_automata as NonDeterministicAutomata).AddEpsilon(_currState, _currState + 1);
             else
-                _automata.AddTransition(_currSymbol, _currState, _currState + 1);
+                (_automata as IAutomataTableBuilder).AddTransition(_currSymbol, _currState, _currState + 1);
             return this;
         }
         
@@ -81,7 +81,7 @@ namespace Automata.Core.Facade
             if(_isEpsilon)
                 (_automata as NonDeterministicAutomata).AddEpsilon(_currState, _currState - 1);
             else
-                _automata.AddTransition(_currSymbol, _currState, _currState - 1);
+                (_automata as IAutomataTableBuilder).AddTransition(_currSymbol, _currState, _currState - 1);
             return this;
         }
         
@@ -97,13 +97,13 @@ namespace Automata.Core.Facade
             if(_isEpsilon)
                 (_automata as NonDeterministicAutomata).AddEpsilon(_currState, index);
             else
-                _automata.AddTransition(_currSymbol, _currState, index);
+                (_automata as IAutomataTableBuilder).AddTransition(_currSymbol, _currState, index);
             return this;
         }
         
         public AutomataModel<T> ToFirst()
         {
-            _automata.AddTransition(_currSymbol, _currState, 0);
+            (_automata as IAutomataTableBuilder).AddTransition(_currSymbol, _currState, 0);
             return this;
         }
         
@@ -134,13 +134,13 @@ namespace Automata.Core.Facade
         
         public AutomataModel<T> Repeat()
         {
-            _automata.AddTransition(_currSymbol, _currState, _currState);
+            (_automata as IAutomataTableBuilder).AddTransition(_currSymbol, _currState, _currState);
             return this;
         }
         
         public AutomataModel<T> Accept()
         {
-            _automata.AcceptState(_currState);
+            (_automata as IAutomataTableBuilder).AcceptState(_currState);
             return this;
         }
         

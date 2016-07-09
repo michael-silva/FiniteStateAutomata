@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace Automata.Core.Interfaces
@@ -9,15 +8,17 @@ namespace Automata.Core.Interfaces
         bool Acceptance { get; }        
         bool Empty { get; }        
         bool Totality { get; }
-        void AddTransition(int symbolIndex, int fromState, int toState);
-        void AcceptState(int index);
         IAutomata Clone();
         
         bool Equals(IAutomata value);
-        //bool Match(string value);
-
-        //bool IsMatch(params T[] values);
-
-        //List<int[]> Matches(params T[] values);
+        bool SubsetOf(IAutomata automata);
+        bool AnyMatch(params string[] values);
+        bool AnyMatch(params char[] values);
+        List<int[]> Matches(params string[] values);
+        List<int[]> Matches(params char[] values);
+        bool IsMatch(params string[] values);
+        bool IsMatch(params char[] values);
+        bool EndMatch(params string[] values);
+        bool EndMatch(params char[] values);
     }
 }

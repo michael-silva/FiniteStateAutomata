@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Automata.Core.FiniteState;
 using Automata.Core.Alphabet;
 using Automata.Core.Interfaces;
