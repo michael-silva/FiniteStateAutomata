@@ -99,14 +99,14 @@ namespace Automata.Core.FiniteState
             int index = _transitions.Count - 1;
             AcceptState(index);
         }
-        #endregion
 
-        #region Operations methods
-        private bool IsAcceptState(int index)
+        public bool IsAcceptState(int index)
         {
             return _transitions[index][ACCEPTCOL] == ACCEPT;
         }
+        #endregion
 
+        #region Operations methods
         private bool SameAlphabet(DeterministicAutomata automata)
         {
             return automata.Alphabet.Equals(_alphabet);
@@ -140,14 +140,8 @@ namespace Automata.Core.FiniteState
                     if((i < _transitions.Count && IsAcceptState(i)) 
                         && (j < automata._transitions.Count && automata._transitions[j][ACCEPTCOL] == ACCEPT))
                     {
-                        //System.Console.WriteLine($"{(i * (automata._transitions.Count + 1)) + j}");
                         ttable[(i * (automata._transitions.Count + 1)) + j][ACCEPTCOL] = ACCEPT;
                     }
-                    
-                    /*System.Console.Write($"{(i * (automata._transitions.Count + 1)) + j}-");
-                    for(int z = 0; z < LENGTH; z++)
-                        System.Console.Write($"{ttable[(i * (automata._transitions.Count + 1)) + j][z] ?? 0}, ");
-                    System.Console.WriteLine();*/
                 }
             }
             
@@ -182,10 +176,6 @@ namespace Automata.Core.FiniteState
                     if((i < _transitions.Count && _transitions[i][ACCEPTCOL] == ACCEPT) 
                         || (j < automata._transitions.Count && automata._transitions[j][ACCEPTCOL] == ACCEPT))
                         ttable[(i * (automata._transitions.Count + 1)) + j][ACCEPTCOL] = ACCEPT;
-                       
-                    /*for(int z = 0; z < LENGTH; z++)
-                        System.Console.Write($"{ttable[(i * (automata._transitions.Count + 1)) + j][z] ?? 0}, ");
-                    System.Console.WriteLine();*/
                 }
             }
             
@@ -218,12 +208,6 @@ namespace Automata.Core.FiniteState
                         ttable.Last()[j] = (ACCEPTCOL > j ? _transitions.Count : 0) + automata._transitions[i][j].Value;
             }
             
-            /*for(int i = 0; i < ttable.Count; i++)
-            {
-                for (int j = 0; j < ACCEPTCOL; j++)
-                    System.Console.Write($"{ttable[i][j]}, ");
-                System.Console.WriteLine();
-            }*/
             return new DeterministicAutomata(_alphabet, ttable);
         }
 
