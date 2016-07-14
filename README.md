@@ -1,34 +1,40 @@
 # Automata.Net
 A implementation of Finite State Automatas Deterministic and  E-NonDeterministic in C#.
 
-Getting started
+## Getting started
 Create a alphabet instance
-var sheepabcd = new AutomataCharAlphabet("ba!");
-
+```var sheepabcd = new AutomataCharAlphabet("ba!");```
 Instantiate a automata injecting alphabet
-var sheeptalk = new DeterministicAutomata(sheepabcd);
+```var sheeptalk = new DeterministicAutomata(sheepabcd);```
 
 Define transitions
+```
 sheeptalk.State(1, null, null)
         .State(null, 2, null)
         .State(null, 3, null)
         .State(null, 3, 4)
         .State(null, null, null)
         .AcceptLast();
+```
 
 And test automata
+```
 bool accept = sheeptalk.IsMatch("baaa!"); //Match consecutive string
 bool reject = sheeptalk.IsMatch("bbaa!");
+```
 
 Other types of alphabets
+```
 var alphabetChar = new AutomataCharAlphabet("abcd");
 var alphabet = new AutomataAlphabet("a", "b", "c");
 var alphabetGroup = new AutomataGroupAlphabet()
             .Add("g1", new [] { "a", "b", "c" })
             .Add("g2", new [] { "d", "e", "f", "g" })
             .Add("g3", new[] { "h", "i" });
+```
 
 Ways to define transitions
+```
 automata.State(1, null, null)
     .State(null, 2, null)
     .State(null, null, null)
@@ -37,7 +43,7 @@ automata.State(1, null, null)
 automata.AddTransition('a', 0, 1); 
 automata.AddTransition('b', 1, 2); 
 automata.AcceptState(3);
-
+```
 Using the factory
 //Factory para criação de automatas através de interface fluente e string que define um alfabeto de chars
 var sheepfactory = new AutomataFactory("ba!");
