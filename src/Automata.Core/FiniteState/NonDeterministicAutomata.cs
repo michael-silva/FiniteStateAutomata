@@ -818,10 +818,10 @@ namespace Automata.Core.FiniteState
             return matches.Count > 0 && matches.Last()[1] == values.Length - 1;
         }
 
-        public bool Match(string input)
+        /*public bool Match(string input)
         {
             return false;
-        }
+        }*/
         #endregion
     }
 }

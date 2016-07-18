@@ -428,7 +428,7 @@ namespace Automata.Core.FiniteState
             return matches.Count > 0 && matches.Last()[1] == values.Count - 1;
         }
         
-        public bool Match(string input)
+        /*public bool Match(string input)
         {
             int i = 0, j = 0, curr = 0, aux = 0;
             int? temp = null;
@@ -456,7 +456,7 @@ namespace Automata.Core.FiniteState
             }
 
             return _transitions[curr][ACCEPTCOL] == ACCEPT;
-        }
+        }*/
         #endregion
     }
 }
