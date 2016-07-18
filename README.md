@@ -134,6 +134,5 @@ System.Console.WriteLine($"'one cents' is {r2}");
 ```
 
 ### Next Steps
-comment the code
-Test Match with examples inside chapter 3
-Implement transducer
+- Test Match with examples inside chapter 3
+- Implement transducer

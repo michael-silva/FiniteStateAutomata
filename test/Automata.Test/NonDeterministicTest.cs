@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using Automata.Console.Samples;
+using Automata.Core.Alphabet;
+using Automata.Core.Facade;
+using Automata.Core.FiniteState;
 using Xunit;
 
 namespace Automata.Test
